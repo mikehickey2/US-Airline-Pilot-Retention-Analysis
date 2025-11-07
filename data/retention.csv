@@ -1,0 +1,426 @@
+StartDate,EndDate,Status,Progress,Duration (in seconds),Finished,RecordedDate,ResponseId,DistributionChannel,UserLanguage,Q_RecaptchaScore,informed_consent,screener,age,gender,nationality,base_state,positionPosition,air_carrier_type,experience,Total_flying_hours,military_experience,general_1,general_2,general_3,general_4,general_5,general_6,financial_1,financial_2,financial_3,financial_4,financial_5,financial_6,QoL_1,QoL_2,QoL_3,QoL_4,QoL_5,QoL_6,professional_1,professional_2,professional_3,professional_4,professional_5,recognition_1,recognition_3,recognition_4,recognition_7,schedule_1,schedule_2,schedule_3,schedule_4,schedule_5,operational_1,operational_2,operational_3,operational_4,operational_5,leaving,when,why
+Start Date,End Date,Response Type,Progress,Duration (in seconds),Finished,Recorded Date,Response ID,Distribution Channel,User Language,Q_RecaptchaScore,"By selecting ""Yes"" you acknowledge that you have read the above statements and consent to your participation in this research.",Are you currently employed as a commercial or airline transport pilot with an FAA-certified air carrier in the United States?,What is your age?,What is you gender?,List of Countries,"50 States, D.C. and Puerto Rico",What position do you currently hold?,What type of air carrier do you currently work for?,How many years of airline flying experience do you have (round up to nearest year)?,How many total flying hours do you have,Have you or do you currently serve in the military?,"The most important factor I look for in a job as a pilot is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Financial factors include a competitive salary, allowances, soft pay, benefits package, job security and new/hire/longevity bonuses. (Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, etc.) 
+
+
+Quality of Life factors include a predictable schedule, vacation time, family-friendly policies, the possibility of being based at home, work-life balance, and travel benefits.
+
+
+
+Professional Opportunity factors include a financially stable airline, the opportunity for rapid upgrade, the opportunity to fly larger aircraft, promotion based on merit, and an upgrade based on length of service.
+
+
+
+Recognition factors include an airline that offers professional-looking uniforms, recognition as a professional, additional vacation time for long service, bonuses for long service, and long service awards.
+
+
+
+Schedule factors include a fixed schedule, a variable schedule, flexible work rules, a bid line seniority system, and vacation bidding rules.
+
+
+
+Operational factors include unambiguous standard operating procedures (SOPs), a proactive training environment, well-maintained aircraft, well-equipped aircraft, and highly skilled pilots. - Financial","The most important factor I look for in a job as a pilot is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Financial factors include a competitive salary, allowances, soft pay, benefits package, job security and new/hire/longevity bonuses. (Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, etc.) 
+
+
+Quality of Life factors include a predictable schedule, vacation time, family-friendly policies, the possibility of being based at home, work-life balance, and travel benefits.
+
+
+
+Professional Opportunity factors include a financially stable airline, the opportunity for rapid upgrade, the opportunity to fly larger aircraft, promotion based on merit, and an upgrade based on length of service.
+
+
+
+Recognition factors include an airline that offers professional-looking uniforms, recognition as a professional, additional vacation time for long service, bonuses for long service, and long service awards.
+
+
+
+Schedule factors include a fixed schedule, a variable schedule, flexible work rules, a bid line seniority system, and vacation bidding rules.
+
+
+
+Operational factors include unambiguous standard operating procedures (SOPs), a proactive training environment, well-maintained aircraft, well-equipped aircraft, and highly skilled pilots. - Lifestyle","The most important factor I look for in a job as a pilot is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Financial factors include a competitive salary, allowances, soft pay, benefits package, job security and new/hire/longevity bonuses. (Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, etc.) 
+
+
+Quality of Life factors include a predictable schedule, vacation time, family-friendly policies, the possibility of being based at home, work-life balance, and travel benefits.
+
+
+
+Professional Opportunity factors include a financially stable airline, the opportunity for rapid upgrade, the opportunity to fly larger aircraft, promotion based on merit, and an upgrade based on length of service.
+
+
+
+Recognition factors include an airline that offers professional-looking uniforms, recognition as a professional, additional vacation time for long service, bonuses for long service, and long service awards.
+
+
+
+Schedule factors include a fixed schedule, a variable schedule, flexible work rules, a bid line seniority system, and vacation bidding rules.
+
+
+
+Operational factors include unambiguous standard operating procedures (SOPs), a proactive training environment, well-maintained aircraft, well-equipped aircraft, and highly skilled pilots. - Professional Opportunity","The most important factor I look for in a job as a pilot is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Financial factors include a competitive salary, allowances, soft pay, benefits package, job security and new/hire/longevity bonuses. (Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, etc.) 
+
+
+Quality of Life factors include a predictable schedule, vacation time, family-friendly policies, the possibility of being based at home, work-life balance, and travel benefits.
+
+
+
+Professional Opportunity factors include a financially stable airline, the opportunity for rapid upgrade, the opportunity to fly larger aircraft, promotion based on merit, and an upgrade based on length of service.
+
+
+
+Recognition factors include an airline that offers professional-looking uniforms, recognition as a professional, additional vacation time for long service, bonuses for long service, and long service awards.
+
+
+
+Schedule factors include a fixed schedule, a variable schedule, flexible work rules, a bid line seniority system, and vacation bidding rules.
+
+
+
+Operational factors include unambiguous standard operating procedures (SOPs), a proactive training environment, well-maintained aircraft, well-equipped aircraft, and highly skilled pilots. - Recognition","The most important factor I look for in a job as a pilot is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Financial factors include a competitive salary, allowances, soft pay, benefits package, job security and new/hire/longevity bonuses. (Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, etc.) 
+
+
+Quality of Life factors include a predictable schedule, vacation time, family-friendly policies, the possibility of being based at home, work-life balance, and travel benefits.
+
+
+
+Professional Opportunity factors include a financially stable airline, the opportunity for rapid upgrade, the opportunity to fly larger aircraft, promotion based on merit, and an upgrade based on length of service.
+
+
+
+Recognition factors include an airline that offers professional-looking uniforms, recognition as a professional, additional vacation time for long service, bonuses for long service, and long service awards.
+
+
+
+Schedule factors include a fixed schedule, a variable schedule, flexible work rules, a bid line seniority system, and vacation bidding rules.
+
+
+
+Operational factors include unambiguous standard operating procedures (SOPs), a proactive training environment, well-maintained aircraft, well-equipped aircraft, and highly skilled pilots. - Schedule","The most important factor I look for in a job as a pilot is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Financial factors include a competitive salary, allowances, soft pay, benefits package, job security and new/hire/longevity bonuses. (Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, etc.) 
+
+
+Quality of Life factors include a predictable schedule, vacation time, family-friendly policies, the possibility of being based at home, work-life balance, and travel benefits.
+
+
+
+Professional Opportunity factors include a financially stable airline, the opportunity for rapid upgrade, the opportunity to fly larger aircraft, promotion based on merit, and an upgrade based on length of service.
+
+
+
+Recognition factors include an airline that offers professional-looking uniforms, recognition as a professional, additional vacation time for long service, bonuses for long service, and long service awards.
+
+
+
+Schedule factors include a fixed schedule, a variable schedule, flexible work rules, a bid line seniority system, and vacation bidding rules.
+
+
+
+Operational factors include unambiguous standard operating procedures (SOPs), a proactive training environment, well-maintained aircraft, well-equipped aircraft, and highly skilled pilots. - Operational Excellence","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Note: Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, bonuses, etc. - A competitive salary","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Note: Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, bonuses, etc. - Allowances and soft pay","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Note: Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, bonuses, etc. - A competitive benefits package","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Note: Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, bonuses, etc. - Loss of certificate disability insurance","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Note: Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, bonuses, etc. - Job security","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important.
+
+
+
+Note: Allowances and soft pay are pays you receive above your minimum monthly guarantee and include per diem, uniform/luggage pays, productivity pay, availability of overtime pay, bonuses, etc. - New hire & longevity bonuses","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important. - A predictable schedule","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important. - Vacation time","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important. - Family friendly policies","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important. - Possibility to be based at home","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important. - Travel benefits","It is most important to me that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 6 for the 6th most important. - Work-Life Balance","It is most important to me as a pilot that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Financially stable airline","It is most important to me as a pilot that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Opportunity for rapid upgrade","It is most important to me as a pilot that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Opportunity to fly larger aircraft","It is most important to me as a pilot that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Upgrade opportunity based on merit","It is most important to me as a pilot that my employer offers:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Upgrade opportunity based on length of service","It is most important to me as a pilot that:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - my airline provides a professional-looking uniform","It is most important to me as a pilot that:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - my airline offers additional vacation time for higher seniority","It is most important to me as a pilot that:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - my peers treat me as a professional","It is most important to me as a pilot that:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - my family and friends recognize the airline I work for","It is most important thing to me about my schedule is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - A fixed schedule","It is most important thing to me about my schedule is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - A variable schedule","It is most important thing to me about my schedule is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Flexible scheduling rules","It is most important thing to me about my schedule is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Bid line seniority system","It is most important thing to me about my schedule is:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Vacation bidding policy","It is most important to me as a pilot that my employer has:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Unambiguous Standard Operating Procedures","It is most important to me as a pilot that my employer has:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - A proactive training environment","It is most important to me as a pilot that my employer has:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Well-maintained aircraft","It is most important to me as a pilot that my employer has:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Well-equipped aircraft","It is most important to me as a pilot that my employer has:
+
+
+
+Please rank these factors in order of importance to you, with 1 being the most important, 2 being the 2nd most important, and on down to 5 for the 5th most important. - Highly skilled pilots",Do you intend on leaving your current airline?,"If you do leave your airline, when do you plan on leaving from now?","If you were to leave your airline, describe why you want to leave?"
+"{""ImportId"":""startDate"",""timeZone"":""America/Denver""}","{""ImportId"":""endDate"",""timeZone"":""America/Denver""}","{""ImportId"":""status""}","{""ImportId"":""progress""}","{""ImportId"":""duration""}","{""ImportId"":""finished""}","{""ImportId"":""recordedDate"",""timeZone"":""America/Denver""}","{""ImportId"":""_recordId""}","{""ImportId"":""distributionChannel""}","{""ImportId"":""userLanguage""}","{""ImportId"":""Q_RecaptchaScore""}","{""ImportId"":""QID3""}","{""ImportId"":""QID24""}","{""ImportId"":""QID1_TEXT""}","{""ImportId"":""QID4""}","{""ImportId"":""QID5""}","{""ImportId"":""QID6""}","{""ImportId"":""QID7""}","{""ImportId"":""QID21""}","{""ImportId"":""QID8_TEXT""}","{""ImportId"":""QID22_TEXT""}","{""ImportId"":""QID23""}","{""ImportId"":""QID10_1""}","{""ImportId"":""QID10_2""}","{""ImportId"":""QID10_3""}","{""ImportId"":""QID10_4""}","{""ImportId"":""QID10_5""}","{""ImportId"":""QID10_6""}","{""ImportId"":""QID11_1""}","{""ImportId"":""QID11_2""}","{""ImportId"":""QID11_3""}","{""ImportId"":""QID11_4""}","{""ImportId"":""QID11_5""}","{""ImportId"":""QID11_6""}","{""ImportId"":""QID12_1""}","{""ImportId"":""QID12_2""}","{""ImportId"":""QID12_3""}","{""ImportId"":""QID12_4""}","{""ImportId"":""QID12_5""}","{""ImportId"":""QID12_6""}","{""ImportId"":""QID13_1""}","{""ImportId"":""QID13_2""}","{""ImportId"":""QID13_3""}","{""ImportId"":""QID13_4""}","{""ImportId"":""QID13_5""}","{""ImportId"":""QID14_1""}","{""ImportId"":""QID14_2""}","{""ImportId"":""QID14_3""}","{""ImportId"":""QID14_4""}","{""ImportId"":""QID15_1""}","{""ImportId"":""QID15_2""}","{""ImportId"":""QID15_3""}","{""ImportId"":""QID15_4""}","{""ImportId"":""QID15_5""}","{""ImportId"":""QID16_1""}","{""ImportId"":""QID16_2""}","{""ImportId"":""QID16_3""}","{""ImportId"":""QID16_4""}","{""ImportId"":""QID16_5""}","{""ImportId"":""QID19""}","{""ImportId"":""QID18""}","{""ImportId"":""QID20_TEXT""}"
+2025-03-23 20:36:25,2025-03-23 20:36:57,IP Address,14,32,False,2025-03-26 20:37:05,R_9G8laMn8oIVcXRv,anonymous,EN,0.8999999761581421,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-23 20:57:50,2025-03-23 20:59:30,IP Address,14,99,False,2025-03-26 20:59:34,R_7NfzycAe8z5eEWA,anonymous,EN,0.8999999761581421,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-23 20:27:40,2025-03-24 08:02:58,IP Address,0,41717,False,2025-03-27 08:03:01,R_9r18QnVbXn8wObU,anonymous,EN,0.8999999761581421,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-24 07:37:41,2025-03-24 08:51:01,IP Address,0,4400,False,2025-03-27 08:51:02,R_3b2Hh2iAjRYwHct,anonymous,EN,1,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 13:55:02,2025-03-29 13:59:17,IP Address,100,255,True,2025-03-29 13:59:18,R_7WYt16BpTw0Kdvb,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,California,First Officer,Low Cost Carrier,3,3000,Never served in the military,2,1,6,5,3,4,1,2,4,3,5,6,1,2,4,6,5,3,1,3,4,5,2,2,1,3,4,5,3,1,4,2,1,2,3,5,4,Maybe,1-2 years,"Bases in lower cost of living areas. "
+2025-03-29 13:54:33,2025-03-29 14:00:33,IP Address,100,359,True,2025-03-29 14:00:33,R_5LGrz1zNz4iNXkb,anonymous,EN,0.8999999761581421,Yes,Yes,28,Male,United States of America,Ohio,Captain,Regional Airline,3,2800,Never served in the military,1,4,2,5,3,6,2,5,4,3,1,6,3,6,4,2,5,1,1,4,2,5,3,3,2,1,4,1,5,2,4,3,1,2,4,5,3,Yes,1-2 years,"For a better airline that has better opportunities "
+2025-03-29 13:56:35,2025-03-29 14:01:39,IP Address,100,304,True,2025-03-29 14:01:39,R_61v4VZpM30Bqd3y,anonymous,EN,0.8999999761581421,Yes,Yes,48,Female,United States of America,Montana,Captain,Freight/Cargo Carrier,11,6800,Never served in the military,1,2,5,6,3,4,1,2,3,5,4,6,1,3,6,4,5,2,1,4,3,5,2,3,2,1,4,1,4,5,2,3,1,4,2,5,3,Yes,Within 1 year,"Unfair, unsafe, and fatiguing work rules/schedules. Company is not negotiating in good faith. "
+2025-03-29 13:52:47,2025-03-29 14:02:05,IP Address,100,557,True,2025-03-29 14:02:05,R_5D3chM1u6sQYMLf,anonymous,EN,1,Yes,Yes,34,Male,United States of America,Pennsylvania,Captain,Regional Airline,4,3600,Previously served in the military,1,2,3,6,4,5,1,4,2,6,3,5,3,4,6,1,5,2,1,2,4,3,5,3,1,2,4,2,3,1,4,5,3,5,1,2,4,Yes,1-2 years,"More pay, better 401k, better reserve schedule, higher seniority for non-reving, better ability to manipulate my scheudle."
+2025-03-29 13:57:35,2025-03-29 14:03:32,IP Address,100,357,True,2025-03-29 14:03:33,R_3LHAvCsYURSFkp7,anonymous,EN,0.8999999761581421,Yes,Yes,23,Male,United States of America,Ohio,First Officer,Regional Airline,1,2400,Never served in the military,1,2,4,6,3,5,1,4,2,6,3,5,2,5,6,3,4,1,2,4,3,1,5,2,3,1,4,5,3,2,1,4,1,2,3,5,4,Yes,1-2 years,"Transition to mainline, for better pay, and benefits "
+2025-03-29 14:00:45,2025-03-29 14:10:20,IP Address,100,574,True,2025-03-29 14:10:20,R_7MJUB56fdYAoLJ7,anonymous,EN,0.8999999761581421,Yes,Yes,42,Male,United States of America,Illinois,First Officer,Regional Airline,2,2500,Never served in the military,1,6,3,2,4,5,1,3,4,5,2,6,1,5,6,2,3,4,1,2,3,5,4,1,2,3,4,1,4,2,3,5,3,1,2,5,4,Maybe,1-2 years,Fly larger aircraft that pays better
+2025-03-29 14:06:57,2025-03-29 14:14:27,IP Address,100,450,True,2025-03-29 14:14:29,R_30TPISDRuzzYDx7,anonymous,EN,1,Yes,Yes,58,Male,United States of America,Virginia,Captain,Regional Airline,8,7000,Previously served in the military,2,4,6,5,1,3,1,5,2,4,3,6,2,4,6,1,3,5,1,4,5,2,3,4,1,3,2,1,5,2,4,3,3,1,2,5,4,No,,
+2025-03-29 14:07:16,2025-03-29 14:15:21,IP Address,100,485,True,2025-03-29 14:15:21,R_37O0FLdRZZTccML,anonymous,EN,0.8999999761581421,Yes,Yes,25,Male,Lao People's Democratic Republic,Ohio,First Officer,Regional Airline,6,2020,Never served in the military,1,4,3,6,2,5,2,3,5,6,1,4,2,6,3,4,5,1,1,2,5,4,3,3,2,1,4,2,3,1,5,4,1,2,3,5,4,Yes,3-4 years,Want to work for an airline that has a base where I live. I currently commute.
+2025-03-29 14:13:11,2025-03-29 14:18:29,IP Address,100,318,True,2025-03-29 14:18:29,R_3ms3WtXcbeuCz5v,anonymous,EN,0.8999999761581421,Yes,Yes,30,Male,United States of America,Indiana,First Officer,Regional Airline,3,3000,Never served in the military,4,2,5,6,1,3,2,4,6,5,1,3,3,5,4,2,6,1,1,5,4,2,3,2,4,1,3,2,3,1,4,5,5,2,3,4,1,Maybe,1-2 years,"Advancement. I genuinely enjoy my current airline, however moving to a legacy in the near future would provide greater pay and a similar schedule to upgrading at my current airline,"
+2025-03-29 14:15:12,2025-03-29 14:20:20,IP Address,100,307,True,2025-03-29 14:20:21,R_5KqiQaJYAIBS5XJ,anonymous,EN,0.8999999761581421,Yes,Yes,29,Male,United States of America,Ohio,Captain,Regional Airline,7,4000,Never served in the military,3,1,6,5,2,4,2,4,3,5,1,6,3,5,4,1,6,2,1,3,4,2,5,3,1,2,4,1,5,2,3,4,4,3,1,5,2,Maybe,over 4 years,Larger airline that offers an equal or better quality of life
+2025-03-29 14:13:50,2025-03-29 14:20:32,IP Address,100,401,True,2025-03-29 14:20:32,R_3255ZxryyqUp6Qs,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,Pennsylvania,Captain,Regional Airline,3,3000,Never served in the military,1,2,5,4,3,6,1,4,5,6,3,2,1,2,5,6,3,4,2,3,1,5,4,4,3,1,2,5,1,4,2,3,5,4,2,3,1,Yes,1-2 years,The pay that comes with larger aircraft types
+2025-03-29 14:14:43,2025-03-29 14:21:10,IP Address,100,386,True,2025-03-29 14:21:10,R_5TuJWzjnAPu59U5,anonymous,EN,0.8999999761581421,Yes,Yes,28,Male,United States of America,Ohio,First Officer,Regional Airline,3,2137,Never served in the military,3,1,6,5,2,4,2,4,5,3,1,6,2,5,6,3,4,1,1,5,2,3,4,2,3,1,4,1,5,4,3,2,5,4,2,3,1,Maybe,over 4 years,I want to be home every night and more pay
+2025-03-29 14:16:04,2025-03-29 14:21:13,IP Address,100,309,True,2025-03-29 14:21:13,R_6OTkImHetStwqkI,anonymous,EN,0.8999999761581421,Yes,Yes,30,Male,United States of America,Tennessee,First Officer,Legacy/Mainline Part 121 Airline,7,4000,Previously served in the military,2,1,4,6,3,5,1,3,4,5,2,6,3,4,6,1,5,2,1,3,5,4,2,4,2,1,3,5,4,2,1,3,3,4,2,5,1,No,,
+2025-03-29 14:24:14,2025-03-29 14:30:55,IP Address,100,401,True,2025-03-29 14:30:56,R_315v6pRnRfUe8fy,anonymous,EN,1,Yes,Yes,49,Male,United States of America,Virginia,First Officer,Legacy/Mainline Part 121 Airline,4,5600,Previously served in the military,2,1,5,6,3,4,1,5,3,4,2,6,1,6,3,2,5,4,1,4,2,5,3,4,2,1,3,5,1,2,3,4,4,1,3,5,2,No,,
+2025-03-29 14:26:08,2025-03-29 14:31:55,IP Address,100,347,True,2025-03-29 14:31:55,R_7ITc6iNjg0lIyLT,anonymous,EN,0.8999999761581421,Yes,Yes,30,Male,United States of America,New Jersey,Captain,Regional Airline,7,5500,Never served in the military,3,2,4,6,1,5,2,5,3,4,1,6,3,5,6,2,4,1,1,4,2,5,3,3,2,1,4,2,3,1,4,5,4,3,1,5,2,Yes,Within 1 year,QOL
+2025-03-29 14:27:59,2025-03-29 14:35:24,IP Address,100,444,True,2025-03-29 14:35:24,R_3I73ShkXonYly5r,anonymous,EN,0.8999999761581421,Yes,Yes,32,Male,United States of America,Kentucky,Captain,Regional Airline,8,8000,Never served in the military,4,1,5,6,2,3,2,6,1,4,3,5,4,5,6,2,3,1,1,5,4,2,3,4,2,1,3,4,5,1,3,2,3,4,2,5,1,Yes,Within 1 year,Company has made no strides to expand to change in many years. Gone as far as I can here
+2025-03-29 14:38:19,2025-03-29 14:43:46,IP Address,100,326,True,2025-03-29 14:43:46,R_1kAjqG1lb4ZkHPg,anonymous,EN,0.8999999761581421,Yes,Yes,32,Female,United States of America,Kentucky,First Officer,Legacy/Mainline Part 121 Airline,3,4000,Never served in the military,3,2,5,6,1,4,1,5,2,3,4,6,3,4,5,1,6,2,1,5,4,3,2,3,2,1,4,2,5,1,4,3,3,2,1,5,4,No,,
+2025-03-29 14:44:17,2025-03-29 14:47:36,IP Address,100,199,True,2025-03-29 14:47:37,R_7azbpHGgG7VkypX,anonymous,EN,0.6000000238418579,Yes,Yes,23,Male,United States of America,Illinois,First Officer,Regional Airline,1,1350,Never served in the military,2,1,5,6,3,4,2,6,1,4,3,5,3,6,4,2,5,1,2,4,3,1,5,2,4,1,3,1,5,2,4,3,1,3,5,4,2,Maybe,3-4 years,"Better pay, more opportunity and flights"
+2025-03-29 13:59:10,2025-03-29 14:50:44,IP Address,100,3094,True,2025-03-29 14:50:44,R_32DwtciseCMnkd4,anonymous,EN,0.6000000238418579,Yes,Yes,29,Male,United States of America,Michigan,First Officer,Legacy/Mainline Part 121 Airline,4,3800,Never served in the military,2,1,3,6,4,5,1,4,2,3,5,6,1,2,3,6,4,5,1,5,2,4,3,3,4,2,1,2,3,5,1,4,5,2,3,4,1,No,,
+2025-03-29 14:57:55,2025-03-29 15:01:45,IP Address,100,229,True,2025-03-29 15:01:45,R_7EBkHqf7Wd1FCKh,anonymous,EN,0.8999999761581421,Yes,Yes,26,Male,United States of America,New York,Captain,Regional Airline,3,2800,Never served in the military,1,3,4,6,2,5,1,4,2,5,3,6,4,5,6,3,1,2,1,4,2,5,3,4,1,3,2,4,5,1,3,2,1,2,3,4,5,Maybe,1-2 years,Work for a legacy.
+2025-03-29 14:58:07,2025-03-29 15:02:22,IP Address,100,254,True,2025-03-29 15:02:22,R_7VkRGcERWm6ndip,anonymous,EN,0.8999999761581421,Yes,Yes,40,Male,United States of America,Indiana,Captain,Regional Airline,14,8000,Previously served in the military,3,2,4,6,1,5,1,2,5,6,3,4,5,4,3,1,6,2,1,3,5,2,4,3,1,2,4,5,1,2,4,3,1,2,4,5,3,Maybe,over 4 years,"Do international flying "
+2025-03-29 15:00:41,2025-03-29 15:04:56,IP Address,100,254,True,2025-03-29 15:04:56,R_34ozo5XPoyijBfF,anonymous,EN,0.8999999761581421,Yes,Yes,35,Male,United States of America,New Jersey,First Officer,Regional Airline,3,2400,Never served in the military,1,4,3,5,2,6,2,3,5,4,1,6,3,1,4,5,6,2,1,5,2,3,4,3,1,4,2,4,3,1,2,5,4,5,1,2,3,Yes,1-2 years,Pay and QOL
+2025-03-29 15:01:57,2025-03-29 15:07:35,IP Address,100,337,True,2025-03-29 15:07:35,R_3k6bpBjqXaaRWdb,anonymous,EN,0.8999999761581421,Yes,Yes,38,Male,United States of America,Michigan,Captain,Low Cost Carrier,10,8000,Previously served in the military,3,1,4,6,2,5,2,5,1,4,3,6,3,4,6,1,5,2,1,2,5,4,3,4,1,2,3,5,1,2,4,3,2,3,4,5,1,Maybe,over 4 years,Once my kids are out of the the house For a legacy passenger carrier
+2025-03-29 15:05:18,2025-03-29 15:09:16,IP Address,100,238,True,2025-03-29 15:09:17,R_17JC4Mze62FTKKH,anonymous,EN,0.8999999761581421,Yes,Yes,35,Male,United States of America,Ohio,Captain,Regional Airline,15,11500,Never served in the military,3,1,5,6,2,4,2,3,4,5,1,6,2,3,6,1,5,4,1,3,4,5,2,3,1,2,4,5,4,3,1,2,4,3,2,5,1,No,,
+2025-03-29 15:26:37,2025-03-29 15:32:34,IP Address,100,356,True,2025-03-29 15:32:34,R_10klTv5vzkAnvMJ,anonymous,EN,0.800000011920929,Yes,Yes,33,Prefer not to say,United States of America,Indiana,First Officer,Regional Airline,3,2000,Never served in the military,3,1,5,6,2,4,3,6,1,5,2,4,3,5,4,1,6,2,1,4,5,3,2,4,1,2,3,2,3,5,1,4,5,2,3,4,1,Maybe,3-4 years,N/A
+2025-03-29 15:49:42,2025-03-29 15:57:03,IP Address,100,441,True,2025-03-29 15:57:03,R_3k6ugwmnxvPAIW7,anonymous,EN,0.8999999761581421,Yes,Yes,29,Male,United States of America,Indiana,Captain,Regional Airline,6,4500,Never served in the military,1,2,5,6,3,4,1,4,5,3,2,6,6,2,3,1,4,5,1,4,5,2,3,1,2,3,4,4,1,5,2,3,5,3,1,2,4,Maybe,1-2 years,
+2025-03-29 15:54:10,2025-03-29 15:57:57,IP Address,100,227,True,2025-03-29 15:57:58,R_6NdTblhNzRLP769,anonymous,EN,0.800000011920929,Yes,Yes,25,Male,United States of America,Illinois,First Officer,Low Cost Carrier,3,2700,Never served in the military,3,2,6,5,1,4,2,5,3,4,1,6,3,5,4,2,6,1,1,2,5,4,3,4,1,3,2,5,4,1,2,3,4,3,1,5,2,No,,
+2025-03-29 15:54:39,2025-03-29 15:59:48,IP Address,100,309,True,2025-03-29 15:59:48,R_6NgfLVLz1p5wz0l,anonymous,EN,0.8999999761581421,Yes,Yes,22,Female,United States of America,Ohio,First Officer,Regional Airline,1,1850,Never served in the military,4,1,5,6,2,3,2,5,3,4,1,6,2,4,5,1,6,3,1,4,5,2,3,2,3,1,4,1,4,2,3,5,1,4,2,5,3,Maybe,3-4 years,"Better quality of life, being home based, and better retirement benefits"
+2025-03-29 15:04:34,2025-03-29 16:00:54,IP Address,100,3380,True,2025-03-29 16:00:55,R_6dtK0j9Sx8c7et0,anonymous,EN,1,Yes,Yes,39,Male,United States of America,Delaware,First Officer,Regional Airline,1,1500,Never served in the military,1,3,5,6,2,4,3,5,2,4,1,6,1,5,3,2,6,4,1,4,5,2,3,3,2,1,4,5,4,2,1,3,2,3,1,5,4,Maybe,over 4 years,"Quality of life in the form of less legs per trip, guaranteed home base, better pay."
+2025-03-29 15:57:34,2025-03-29 16:01:20,IP Address,100,226,True,2025-03-29 16:01:21,R_5fvNxmBbEsOrGnf,anonymous,EN,1,Yes,Yes,52,Female,United States of America,Illinois,Captain,Regional Airline,30,20000,Never served in the military,2,1,5,6,3,4,2,3,4,5,1,6,1,5,3,2,6,4,1,4,5,2,3,2,1,3,4,1,5,4,2,3,5,3,1,4,2,No,,
+2025-03-29 16:14:56,2025-03-29 16:18:53,IP Address,100,236,True,2025-03-29 16:18:53,R_6m6AKNvwIi9sL9T,anonymous,EN,0.800000011920929,Yes,Yes,28,Male,United States of America,Florida,First Officer,Legacy/Mainline Part 121 Airline,8,4500,Never served in the military,1,2,5,6,3,4,1,3,4,5,2,6,2,3,4,6,5,1,1,4,2,5,3,4,1,2,3,4,1,2,5,3,5,2,1,4,3,No,,
+2025-03-29 16:17:49,2025-03-29 16:23:52,IP Address,100,363,True,2025-03-29 16:23:53,R_7j81SUNkmOHvTDj,anonymous,EN,0.8999999761581421,Yes,Yes,28,Female,United States of America,Kentucky,First Officer,Regional Airline,2,3800,Never served in the military,3,1,5,6,2,4,4,6,3,2,1,5,3,4,5,2,6,1,2,3,4,1,5,3,1,2,4,3,4,1,5,2,2,1,4,5,3,Yes,1-2 years,"Southwest, so I can be a mom."
+2025-03-29 16:23:33,2025-03-29 16:28:14,IP Address,100,281,True,2025-03-29 16:28:15,R_53VhO7fXJsrenUB,anonymous,EN,0.8999999761581421,Yes,Yes,25,Male,United States of America,Illinois,First Officer,Regional Airline,2,2400,Never served in the military,1,2,5,4,3,6,2,6,3,5,1,4,4,5,1,3,6,2,1,4,2,3,5,3,4,1,2,5,2,3,1,4,5,3,1,2,4,Yes,3-4 years,"Opportunity to be based closer to home, Opportunity to obtain higher pay"
+2025-03-29 17:11:24,2025-03-29 17:18:25,IP Address,100,421,True,2025-03-29 17:18:26,R_7z8dvHpHnzbUEDQ,anonymous,EN,0.8999999761581421,Yes,Yes,36,Male,Mexico,Maryland,First Officer,Legacy/Mainline Part 121 Airline,4,4500,Never served in the military,1,2,5,6,3,4,1,5,3,4,2,6,2,6,3,4,5,1,1,2,5,3,4,2,3,1,4,3,2,1,4,5,1,4,3,5,2,No,,
+2025-03-29 17:17:46,2025-03-29 17:25:30,IP Address,100,464,True,2025-03-29 17:25:31,R_1FJs0pk3gUyMoM7,anonymous,EN,0.8999999761581421,Yes,Yes,29,Male,United States of America,Connecticut,Captain,Regional Airline,2,2600,Never served in the military,2,1,3,6,4,5,1,4,3,5,2,6,3,4,5,1,6,2,1,2,3,4,5,4,1,2,3,5,3,1,2,4,1,3,2,5,4,Maybe,1-2 years,Career Advancement/Pay
+2025-03-29 18:28:54,2025-03-29 18:34:31,IP Address,100,337,True,2025-03-29 18:34:32,R_6HzOf50S9QYu1sR,anonymous,EN,0.8999999761581421,Yes,Yes,34,Male,United States of America,Ohio,First Officer,Regional Airline,7,3000,Never served in the military,5,4,2,6,1,3,4,3,2,1,5,6,3,4,5,2,6,1,2,5,3,1,4,3,2,1,4,2,5,1,4,3,4,2,1,5,3,Maybe,1-2 years,Leave for majors/ more pay/ larger aircraft
+2025-03-29 19:30:08,2025-03-29 19:34:27,IP Address,100,259,True,2025-03-29 19:34:28,R_1h59K2ZtmqoCp6K,anonymous,EN,0.8999999761581421,Yes,Yes,24,Male,United States of America,Ohio,First Officer,Regional Airline,2,2600,Never served in the military,2,4,5,6,1,3,2,1,4,6,3,5,4,6,3,1,5,2,1,3,5,2,4,1,3,2,4,5,1,2,3,4,3,1,2,5,4,Yes,1-2 years,"Although I think RPA, is a great regional, for me it’s not a career destination. I want more pay and more days off"
+2025-03-29 19:35:31,2025-03-29 19:39:07,IP Address,100,216,True,2025-03-29 19:39:07,R_5axbusYWhuTLdk6,anonymous,EN,0.8999999761581421,Yes,Yes,22,Male,United States of America,Arkansas,First Officer,Regional Airline,1,2100,Never served in the military,2,1,4,5,3,6,2,3,4,5,1,6,1,4,6,3,5,2,2,3,1,4,5,1,2,3,4,2,4,5,1,3,1,2,3,5,4,Yes,3-4 years,Better pay and easier commute. Currently two leg commute.
+2025-03-29 19:37:40,2025-03-29 19:41:07,IP Address,100,206,True,2025-03-29 19:41:08,R_1eyTgddoQus6nzu,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,Pennsylvania,Captain,Regional Airline,10,3071,Never served in the military,2,1,4,5,3,6,3,2,4,5,1,6,2,4,5,6,3,1,1,2,5,3,4,3,4,1,2,2,5,1,4,3,4,2,1,5,3,Yes,1-2 years,
+2025-03-29 20:06:18,2025-03-29 20:12:42,IP Address,100,383,True,2025-03-29 20:12:43,R_7aGAXrSRB5ekrnP,anonymous,EN,0.8999999761581421,Yes,Yes,29,Male,United States of America,Georgia,First Officer,Legacy/Mainline Part 121 Airline,4,3304,Never served in the military,3,2,1,4,5,6,1,5,3,4,2,6,2,4,3,6,5,1,1,2,3,5,4,3,2,1,4,5,3,1,2,4,1,3,4,5,2,No,,
+2025-03-29 20:44:32,2025-03-29 20:53:48,IP Address,100,556,True,2025-03-29 20:53:48,R_51bPE2NPMI2dpRc,anonymous,EN,1,Yes,Yes,29,Male,United States of America,New York,First Officer,Regional Airline,13,5500,Never served in the military,2,1,6,4,3,5,1,2,5,4,3,6,2,5,6,1,4,3,1,3,2,4,5,3,2,1,4,1,5,2,3,4,4,1,3,5,2,Yes,Within 1 year,"better pay, career progression , QOL "
+2025-03-29 22:31:53,2025-03-29 22:36:11,IP Address,100,257,True,2025-03-29 22:36:11,R_7Cg2Cx3AXBO7pbW,anonymous,EN,0.8999999761581421,Yes,Yes,25,Male,United States of America,Kentucky,First Officer,Regional Airline,6,2000,Never served in the military,1,3,5,6,2,4,1,2,3,4,5,6,2,4,5,1,3,6,3,1,2,4,5,1,3,2,4,1,5,4,2,3,5,4,1,2,3,Yes,1-2 years,"Pay, aircraft diversity "
+2025-03-30 06:54:32,2025-03-30 07:01:42,IP Address,100,430,True,2025-03-30 07:01:43,R_6d4okU0w21yTdzr,anonymous,EN,0.8999999761581421,Yes,Yes,29,Male,United States of America,Colorado,First Officer,Regional Airline,2,2400,Never served in the military,3,1,5,6,2,4,2,6,3,4,1,5,3,5,4,1,6,2,1,2,4,3,5,3,1,2,4,1,5,2,3,4,1,4,3,5,2,Maybe,3-4 years,Financial opportunity and different base options
+2025-03-30 07:12:05,2025-03-30 07:19:29,IP Address,100,443,True,2025-03-30 07:19:29,R_3oKcBIa9hFrqT0R,anonymous,EN,0.8999999761581421,Yes,Yes,26,Male,Ethiopia,District of Columbia,First Officer,Regional Airline,2,840,Never served in the military,1,2,5,6,3,4,1,2,5,4,3,6,5,3,6,2,4,1,2,3,1,4,5,3,1,2,4,3,2,1,4,5,1,4,3,5,2,Maybe,1-2 years,"Better pay and different experience "
+2025-03-30 07:51:08,2025-03-30 07:57:50,IP Address,100,402,True,2025-03-30 07:57:51,R_58NINxtqtHBVeyG,anonymous,EN,0.8999999761581421,Yes,Yes,28,Male,United States of America,Indiana,Captain,Regional Airline,2,2400,Never served in the military,1,3,4,5,2,6,2,4,3,5,1,6,4,6,2,1,5,3,1,2,5,4,3,2,3,1,4,5,1,2,3,4,5,3,1,4,2,Maybe,1-2 years,"Better quality of life, higher pay, larger area of operation(not just flying to the northeast)"
+2025-03-30 08:02:40,2025-03-30 08:08:55,IP Address,100,374,True,2025-03-30 08:08:55,R_1KuTbN4qGYdJZJv,anonymous,EN,0.8999999761581421,Yes,Yes,33,Male,United States of America,Pennsylvania,First Officer,Regional Airline,1,1650,Never served in the military,3,1,4,6,2,5,2,5,3,6,1,4,1,4,6,3,5,2,1,2,5,3,4,3,2,1,4,4,5,2,1,3,4,3,2,5,1,Maybe,3-4 years,"Fly for a legacy. "
+2025-03-30 09:04:25,2025-03-30 09:11:14,IP Address,100,408,True,2025-03-30 09:11:14,R_1SjYiIFf4GQtENp,anonymous,EN,1,Yes,Yes,63,Male,United States of America,New Jersey,First Officer,Regional Airline,7,4000,Never served in the military,5,4,6,3,1,2,2,3,5,6,1,4,2,4,5,1,6,3,1,5,2,3,4,3,1,2,4,5,1,2,4,3,5,2,3,4,1,Maybe,Within 1 year,"Just to try a diffeent kind of flying, maybe back to part 91"
+2025-03-30 09:36:51,2025-03-30 09:42:19,IP Address,100,327,True,2025-03-30 09:42:20,R_7D0qN7Q5PP5lwhq,anonymous,EN,0.8999999761581421,Yes,Yes,23,Male,United States of America,Kentucky,First Officer,Regional Airline,1,1900,Never served in the military,3,1,4,6,2,5,1,4,3,5,2,6,4,2,5,3,6,1,2,5,1,3,4,3,2,1,4,3,5,2,1,4,1,3,4,2,5,Yes,3-4 years,"Better quality of life, and compensation at a major airline."
+2025-03-30 13:20:42,2025-03-30 13:24:45,IP Address,100,242,True,2025-03-30 13:24:46,R_3g0myiUyRwmktWH,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,New York,First Officer,Regional Airline,4,1500,Never served in the military,1,3,5,6,2,4,1,5,2,4,3,6,4,5,3,2,6,1,2,3,1,5,4,3,1,4,2,3,4,5,1,2,5,3,1,2,4,Yes,1-2 years,Go to a legacy carrier
+2025-03-30 13:27:25,2025-03-30 13:31:03,IP Address,100,217,True,2025-03-30 13:31:03,R_7E9d6vbgLXcDn9v,anonymous,EN,0.8999999761581421,Yes,Yes,30,Male,United States of America,Colorado,First Officer,Legacy/Mainline Part 121 Airline,8,5500,Never served in the military,3,1,5,6,2,4,2,5,3,4,1,6,2,3,5,6,4,1,1,4,2,5,3,3,1,2,4,5,4,1,2,3,4,3,2,5,1,No,,
+2025-03-30 13:31:40,2025-03-30 13:35:15,IP Address,100,215,True,2025-03-30 13:35:16,R_9hNexSupHPTVH5D,anonymous,EN,0.8999999761581421,Yes,Yes,46,Male,United States of America,New York,Captain,Regional Airline,18,12000,Never served in the military,2,3,4,5,1,6,2,3,4,5,1,6,2,4,5,6,3,1,1,5,2,3,4,4,1,2,3,1,5,3,2,4,4,5,1,2,3,No,,
+2025-03-30 14:46:30,2025-03-30 14:47:00,IP Address,100,30,True,2025-03-30 14:47:01,R_6BsLYEgeDlWnic8,anonymous,EN,0.8999999761581421,Yes,No,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-30 16:35:35,2025-03-30 16:39:37,IP Address,100,242,True,2025-03-30 16:39:38,R_5eLi36v4Gtihuuc,anonymous,EN,0.8999999761581421,Yes,Yes,23,Male,United States of America,New York,First Officer,Regional Airline,2,1500,Never served in the military,2,1,5,6,3,4,2,5,3,4,1,6,3,5,6,1,4,2,1,2,5,3,4,3,2,1,4,5,3,1,4,2,3,4,1,5,2,Yes,1-2 years,career progression to a mainline carrier
+2025-03-30 21:47:11,2025-03-30 21:57:26,IP Address,100,614,True,2025-03-30 21:57:27,R_7QFCsIetkiLiNJU,anonymous,EN,0.8999999761581421,Yes,Yes,26,Male,United States of America,Illinois,First Officer,Regional Airline,1,1600,Never served in the military,1,3,6,5,2,4,1,3,4,5,6,2,1,2,3,5,4,6,1,5,2,3,4,1,4,2,3,2,3,1,4,5,5,3,4,2,1,Yes,3-4 years,"It’s a regional airline and the quality of life and pay and opportunity are better at major airlines. "
+2025-03-30 23:08:17,2025-03-30 23:14:23,IP Address,100,366,True,2025-03-30 23:14:24,R_7oe9PWnW1w1jtL3,anonymous,EN,0.8999999761581421,Yes,Yes,26,Male,United States of America,Illinois,Captain,Regional Airline,2,2100,Never served in the military,3,1,4,6,2,5,2,5,4,3,1,6,2,5,4,1,6,3,1,4,5,3,2,3,4,1,2,3,4,1,2,5,1,2,4,5,3,Yes,1-2 years,"Move to a larger more permanent airline. Regional -> Legacy. Basically better on all fronts to a regional in all aspects for the exact same job.  "
+2025-03-31 00:04:13,2025-03-31 00:08:01,IP Address,100,227,True,2025-03-31 00:08:01,R_5OefBbCg3a22SBP,anonymous,EN,1,Yes,Yes,21,Male,United States of America,Illinois,First Officer,Regional Airline,1,1360,Never served in the military,2,1,5,6,3,4,1,3,5,4,2,6,1,4,2,6,5,3,1,3,4,5,2,4,2,1,3,5,2,1,3,4,1,2,4,5,3,Yes,3-4 years,Major/legacy pilots are treated more professionally by their management
+2025-03-31 13:13:27,2025-03-31 13:32:33,IP Address,100,1146,True,2025-03-31 13:32:33,R_5qgu7frgxWikP5f,anonymous,EN,0.8999999761581421,Yes,Yes,25,Female,United States of America,Pennsylvania,First Officer,Regional Airline,3,2500,Never served in the military,3,1,5,6,2,4,4,5,2,3,1,6,3,6,4,1,5,2,1,5,4,2,3,2,1,3,4,5,3,1,2,4,2,4,3,5,1,Yes,Within 1 year,"Better QOL, Bases out West, High 401k contribution at most LCC/Majors"
+2025-03-31 20:13:01,2025-03-31 20:17:53,IP Address,100,291,True,2025-03-31 20:17:53,R_5jONutaYyqCP8KK,anonymous,EN,0.8999999761581421,Yes,Yes,25,Male,United States of America,Pennsylvania,First Officer,Low Cost Carrier,3,2500,Never served in the military,4,2,5,6,1,3,1,5,2,4,3,6,2,3,4,5,6,1,1,3,4,5,2,4,1,2,3,5,4,1,2,3,5,3,1,2,4,No,,
+2025-03-31 23:59:32,2025-04-01 00:05:07,IP Address,100,334,True,2025-04-01 00:05:07,R_7I9Ha9gzU4KewYp,anonymous,EN,0.8999999761581421,Yes,Yes,31,Male,United States of America,Alaska,First Officer,Legacy/Mainline Part 121 Airline,5,3400,Never served in the military,3,1,5,6,2,4,1,4,3,5,2,6,3,4,5,6,2,1,1,2,3,5,4,3,4,2,1,4,3,1,2,5,5,4,1,2,3,No,,
+2025-04-01 04:44:31,2025-04-01 04:50:29,IP Address,100,357,True,2025-04-01 04:50:30,R_1QhAlBLTfWn3MMB,anonymous,EN,1,Yes,Yes,30,Female,United States of America,New York,First Officer,Regional Airline,1,2000,Never served in the military,3,1,4,6,2,5,2,4,3,5,1,6,2,3,6,5,4,1,1,2,5,3,4,1,3,2,4,4,5,1,3,2,5,2,1,3,4,Maybe,3-4 years,
+2025-04-01 07:25:30,2025-04-01 07:34:22,IP Address,100,532,True,2025-04-01 07:34:22,R_5KZmED46SwXjJ2S,anonymous,EN,0.8999999761581421,Yes,Yes,44,Male,United States of America,Indiana,Captain,Regional Airline,19,14000,Never served in the military,1,3,5,6,2,4,2,3,4,5,1,6,5,4,6,1,2,3,1,5,4,3,2,3,1,2,4,5,3,1,2,4,5,4,1,3,2,No,,
+2025-04-01 11:22:39,2025-04-01 11:25:51,IP Address,100,191,True,2025-04-01 11:25:51,R_5EGYvFbehzah626,anonymous,EN,0.8999999761581421,Yes,Yes,26,Male,United States of America,Ohio,First Officer,Regional Airline,1,1900,Never served in the military,3,1,4,6,5,2,1,6,3,5,2,4,1,2,5,6,4,3,1,3,5,2,4,4,3,2,1,1,2,3,4,5,5,2,3,4,1,Yes,3-4 years,Moving on to the majors
+2025-04-01 11:29:13,2025-04-01 11:39:21,IP Address,100,607,True,2025-04-01 11:39:21,R_6EdgFlbgHChBoKB,anonymous,EN,0.8999999761581421,Yes,Yes,30,Male,India,Pennsylvania,First Officer,Regional Airline,3,3250,Never served in the military,1,2,4,6,3,5,1,6,2,4,3,5,2,5,6,3,4,1,1,4,5,2,3,1,3,2,4,1,5,2,3,4,4,2,1,5,3,No,,
+2025-04-01 07:33:38,2025-04-01 12:11:47,IP Address,100,16688,True,2025-04-01 12:11:47,R_7axe8sRX6vlnYhe,anonymous,EN,0.800000011920929,Yes,Yes,41,Male,Germany,Indiana,Captain,Regional Airline,9,11300,Never served in the military,2,3,1,5,4,6,1,3,4,5,2,6,2,4,3,5,6,1,1,4,2,3,5,1,3,4,2,1,3,2,5,4,2,1,4,3,5,Maybe,Within 1 year,More opportunities to fly larger airplanes to worldwide destinations. More retirement contributions. Roughly same pay for fewer working days.
+2025-03-29 13:49:46,2025-03-29 13:51:33,IP Address,55,106,False,2025-04-01 13:51:33,R_7wOb4JtBhblu9jj,anonymous,EN,0.8999999761581421,Yes,Yes,38,Male,United States of America,Georgia,Captain,Legacy/Mainline Part 121 Airline,13,9500,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 13:52:24,2025-03-29 13:55:57,IP Address,55,212,False,2025-04-01 13:56:00,R_7IBsjvlhe8PK334,anonymous,EN,1,Yes,Yes,24,Male,United States of America,New Jersey,First Officer,Regional Airline,1,2000,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 13:56:41,2025-03-29 14:01:47,IP Address,91,305,False,2025-04-01 14:01:51,R_5kdnlGYeSsrpPWc,anonymous,EN,0.8999999761581421,Yes,Yes,26,Male,United States of America,Illinois,Captain,Regional Airline,3,2670,Never served in the military,3,4,5,6,2,1,1,2,4,5,3,6,2,5,4,3,6,1,2,3,1,5,4,3,1,2,4,1,5,3,2,4,4,3,2,5,1,Yes,,
+2025-03-29 14:05:27,2025-03-29 14:06:07,IP Address,14,40,False,2025-04-01 14:06:10,R_1g8aBMRIuHVDis9,anonymous,EN,0.8999999761581421,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:11:14,2025-03-29 14:13:38,IP Address,55,144,False,2025-04-01 14:13:39,R_32zfqAcCdrE3MMk,anonymous,EN,1,Yes,Yes,27,Male,United States of America,Ohio,Captain,Regional Airline,3,2800,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:14:27,2025-03-29 14:15:52,IP Address,55,84,False,2025-04-01 14:15:54,R_5r20hN5sCuKZbkx,anonymous,EN,0.8999999761581421,Yes,Yes,25,Male,United States of America,Michigan,First Officer,Regional Airline,1,500,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:22:43,2025-03-29 14:23:49,IP Address,55,66,False,2025-04-01 14:23:51,R_7U9PrGdv8cyxShh,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,Massachusetts,First Officer,Low Cost Carrier,3,2200,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:26:39,2025-03-29 14:27:35,IP Address,55,56,False,2025-04-01 14:27:36,R_57IsGWQsO4eSL41,anonymous,EN,0.8999999761581421,Yes,Yes,30,Male,United States of America,District of Columbia,First Officer,Regional Airline,2,2200,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:28:06,2025-03-29 14:29:39,IP Address,55,92,False,2025-04-01 14:29:41,R_7ek0HNsb5ZNTanD,anonymous,EN,0.800000011920929,Yes,Yes,47,Male,United States of America,District of Columbia,Captain,Regional Airline,22,20000,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:34:39,2025-03-29 14:35:04,IP Address,14,25,False,2025-04-01 14:35:07,R_1GqAcxzuVwyRw7s,anonymous,EN,0.8999999761581421,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:50:51,2025-03-29 14:51:50,IP Address,55,58,False,2025-04-01 14:51:51,R_3z6zBxZ6kgix4F0,anonymous,EN,0.8999999761581421,Yes,Yes,24,Male,United States of America,Kentucky,Captain,Regional Airline,3,2800,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 14:58:30,2025-03-29 14:59:38,IP Address,55,67,False,2025-04-01 14:59:46,R_3l4taxsCjiLyJ9e,anonymous,EN,0.8999999761581421,Yes,Yes,23,Male,United States of America,Virginia,First Officer,Regional Airline,5,1600,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-01 14:56:54,2025-04-01 15:05:06,IP Address,100,491,True,2025-04-01 15:05:06,R_5PWEroSKCkgyeL7,anonymous,EN,0.8999999761581421,Yes,Yes,24,Male,United States of America,Indiana,First Officer,Regional Airline,2,2110,Never served in the military,4,2,1,6,3,5,2,4,3,6,1,5,3,4,5,1,6,2,1,5,2,3,4,1,4,2,3,5,3,1,2,4,1,2,3,5,4,Maybe,1-2 years,"Professional opportunity and growth. 401k contributions, better pay."
+2025-03-29 15:02:40,2025-03-29 15:05:51,IP Address,55,190,False,2025-04-01 15:05:52,R_3dhowwWvIcVEy5W,anonymous,EN,0.800000011920929,Yes,Yes,32,Male,United States of America,New Jersey,First Officer,Legacy/Mainline Part 121 Airline,6,4500,Currently serve in the military (National Guard and/or Reserve),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 15:06:25,2025-03-29 15:08:11,IP Address,55,106,False,2025-04-01 15:08:11,R_7Y51cPnTcYrcAHU,anonymous,EN,0.8999999761581421,Yes,Yes,26,Male,United States of America,Ohio,First Officer,Legacy/Mainline Part 121 Airline,3,3500,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 16:17:58,2025-03-29 16:20:07,IP Address,55,128,False,2025-04-01 16:20:13,R_6VdUU97ldC3DPyL,anonymous,EN,0.8999999761581421,Yes,Yes,25,Male,United States of America,Indiana,Captain,Regional Airline,6,3250,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 16:39:05,2025-03-29 16:39:42,IP Address,14,37,False,2025-04-01 16:39:46,R_5f7BldnOS3tyxC3,anonymous,EN,1,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 17:24:22,2025-03-29 17:25:20,IP Address,55,57,False,2025-04-01 17:25:24,R_6iLh4lmwbIlhup3,anonymous,EN,0.8999999761581421,Yes,Yes,42,Male,United States of America,New Jersey,First Officer,Regional Airline,3,3000,Previously served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 17:29:44,2025-03-29 17:29:56,IP Address,14,12,False,2025-04-01 17:29:58,R_3hDPWNtWUbTVhG4,anonymous,EN,1,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 17:27:35,2025-03-29 17:34:34,IP Address,86,418,False,2025-04-01 17:34:38,R_1KBKByRnWIeaqOv,anonymous,EN,0.8999999761581421,Yes,Yes,25,Male,United States of America,Illinois,Captain,Regional Airline,3,2200,Never served in the military,2,1,5,6,3,4,1,4,5,2,3,6,4,3,5,6,2,1,1,5,2,3,4,4,2,1,3,5,3,1,4,2,4,5,1,3,2,,,
+2025-03-29 17:46:56,2025-03-29 17:48:02,IP Address,55,65,False,2025-04-01 17:48:05,R_7Oy6F41PipZM1Xt,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,Pennsylvania,Captain,Regional Airline,10,3071,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 22:57:36,2025-03-29 22:58:39,IP Address,14,63,False,2025-04-01 22:58:49,R_6REZPrcuewRUMA9,anonymous,EN,1,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-29 23:26:25,2025-03-29 23:29:14,IP Address,14,168,False,2025-04-01 23:29:18,R_7YgsgQGaWvBYeBP,anonymous,EN,0.8999999761581421,Yes,Yes,28,Male,United States of America,Indiana,Captain,Regional Airline,6,4200,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-02 06:33:19,2025-04-02 06:36:46,IP Address,100,206,True,2025-04-02 06:36:46,R_55LuGf5wKpxcjLD,anonymous,EN,1,Yes,Yes,48,Male,United States of America,New Jersey,First Officer,Regional Airline,1,1900,Previously served in the military,3,2,4,6,1,5,2,4,5,3,1,6,3,5,4,2,6,1,1,2,4,5,3,3,1,2,4,4,5,2,1,3,3,2,1,4,5,No,,
+2025-04-02 06:34:33,2025-04-02 06:40:34,IP Address,100,361,True,2025-04-02 06:40:35,R_6MM2NrhpD06NPDI,anonymous,EN,0.8999999761581421,Yes,Yes,31,Male,United States of America,Pennsylvania,First Officer,Regional Airline,1,2000,Never served in the military,2,1,6,4,3,5,1,3,4,6,2,5,3,2,4,1,6,5,1,3,2,5,4,2,1,3,4,1,5,4,2,3,2,4,1,5,3,Yes,3-4 years,"Better pay/benefits at national/legacy carrier "
+2025-04-02 07:54:56,2025-04-02 07:58:57,IP Address,100,240,True,2025-04-02 07:58:57,R_6nNBGx3sOUEeEyB,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,,Captain,Regional Airline,2,2100,Never served in the military,1,4,5,3,2,6,1,3,2,4,5,6,3,4,5,1,6,2,2,3,1,5,4,1,2,3,4,5,3,1,2,4,4,5,1,3,2,Yes,Within 1 year,Horrible QOL. Only flies in the northeast. Little respect for pilots(was told there was nothing in the contract about how I feel)
+2025-03-30 08:06:42,2025-03-30 08:13:01,IP Address,55,379,False,2025-04-02 08:13:04,R_6EPXsTyNv3ZTGAV,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,Virginia,Captain,Regional Airline,4,3200,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-03-30 10:27:50,2025-03-30 10:28:15,IP Address,14,25,False,2025-04-02 10:28:19,R_5Bx5Wsghci54q3x,anonymous,EN,0.8999999761581421,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-02 10:29:37,2025-04-02 10:30:03,IP Address,100,26,True,2025-04-02 10:30:04,R_2f99ECLfzyrXTUl,anonymous,EN,0.8999999761581421,Yes,No,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-02 13:45:42,2025-04-02 13:51:02,IP Address,100,320,True,2025-04-02 13:51:02,R_51tBOHcBd3eFIWw,anonymous,EN,0.8999999761581421,Yes,Yes,30,Male,United States of America,Indiana,Captain,Regional Airline,3,3100,Never served in the military,2,1,5,6,3,4,2,3,4,5,1,6,2,4,3,5,6,1,1,5,2,3,4,3,2,1,4,5,3,1,4,2,2,3,4,5,1,Yes,1-2 years,"More job security, higher pay, more opportunities"
+2025-03-30 13:58:22,2025-03-30 13:58:41,IP Address,14,19,False,2025-04-02 13:58:42,R_7skfcHGFgHzJmCt,anonymous,EN,0.8999999761581421,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-02 14:17:55,2025-04-02 14:20:41,IP Address,100,165,True,2025-04-02 14:20:41,R_6pnW8RE57VKatPJ,anonymous,EN,0.8999999761581421,Yes,Yes,42,Female,United States of America,Colorado,First Officer,Low Cost Carrier,6,5000,Never served in the military,3,5,4,6,1,2,2,5,4,3,1,6,1,4,2,5,6,3,1,3,2,4,5,3,2,1,4,4,5,1,2,3,4,1,2,5,3,No,,
+2025-04-02 19:28:46,2025-04-02 19:32:14,IP Address,100,207,True,2025-04-02 19:32:14,R_3ttX0gab7p6mxlD,anonymous,EN,0.8999999761581421,Yes,Yes,49,Male,United States of America,Florida,Captain,Legacy/Mainline Part 121 Airline,28,16500,Never served in the military,1,3,4,6,2,5,1,5,4,2,3,6,2,3,6,1,4,5,2,5,1,4,3,4,1,2,3,2,5,3,1,4,3,5,2,1,4,No,,
+2025-04-02 20:28:22,2025-04-02 20:33:50,IP Address,100,328,True,2025-04-02 20:33:51,R_5rI1GRGmj4xIdvT,anonymous,EN,0.8999999761581421,Yes,Yes,27,Male,United States of America,Illinois,First Officer,Regional Airline,1,1950,Never served in the military,3,1,5,6,2,4,2,3,4,5,1,6,3,4,6,1,5,2,1,3,5,2,4,3,2,1,4,5,1,2,3,4,1,4,2,3,5,Yes,over 4 years,Leave for mainline
+2025-04-03 13:34:28,2025-04-03 13:37:42,IP Address,100,193,True,2025-04-03 13:37:42,R_5EuUToItfuIYaNR,anonymous,EN,0.800000011920929,Yes,Yes,21,Male,United States of America,New Jersey,First Officer,Regional Airline,1,1600,Never served in the military,5,2,3,6,4,1,2,3,5,4,1,6,2,3,4,1,5,6,1,3,2,4,5,4,3,1,2,1,2,3,4,5,4,5,1,3,2,Yes,3-4 years,Upgrade to legacy
+2025-04-03 16:00:26,2025-04-03 16:06:42,IP Address,100,376,True,2025-04-03 16:06:43,R_17BC2UA9MUvsE7j,anonymous,EN,0.699999988079071,Yes,Yes,60,Male,New Zealand,New York,Captain,Charter/Fractional (Part 135/91K),30,21000,Never served in the military,2,1,3,6,5,4,1,4,3,5,2,6,2,3,4,5,6,1,1,3,4,2,5,3,2,1,4,3,1,4,5,2,4,1,2,5,3,Maybe,Within 1 year,Better professional development and remuneration
+2025-04-03 18:40:08,2025-04-03 18:48:23,IP Address,100,495,True,2025-04-03 18:48:24,R_5Fx4GY6IZsvuf7T,anonymous,EN,1,Yes,Yes,62,Male,United States of America,New York,Captain,Charter/Fractional (Part 135/91K),22,22000,Never served in the military,1,2,4,5,3,6,1,5,3,4,2,6,1,4,5,3,6,2,1,3,2,4,5,3,1,2,4,1,3,4,5,2,1,2,4,5,3,No,,
+2025-04-04 10:47:03,2025-04-04 10:50:47,IP Address,100,223,True,2025-04-04 10:50:48,R_1LZ99CjXloSeFAU,anonymous,EN,0.8999999761581421,Yes,Yes,24,Male,United States of America,Pennsylvania,First Officer,Regional Airline,2,1950,Never served in the military,1,2,4,6,3,5,1,2,3,5,4,6,4,5,6,1,3,2,1,4,2,5,3,3,2,1,4,4,3,5,1,2,1,2,4,5,3,Yes,1-2 years,"Would like to leave for better opportunities and pay beyond the regional level "
+2025-04-02 08:08:19,2025-04-02 08:08:47,IP Address,14,27,False,2025-04-05 08:08:49,R_1sQEtbg2TSiU8S7,anonymous,EN,0.8999999761581421,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-03 16:10:38,2025-04-03 16:11:07,IP Address,14,29,False,2025-04-06 16:11:14,R_1StHgB7nGmvCIRb,anonymous,EN,0.800000011920929,Yes,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-04 10:44:31,2025-04-04 10:45:25,IP Address,55,54,False,2025-04-07 10:45:28,R_6F22aaZ2waOMgja,anonymous,EN,0.8999999761581421,Yes,Yes,24,Male,United States of America,Pennsylvania,First Officer,Regional Airline,2,1950,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-07 17:54:21,2025-04-07 17:57:53,IP Address,100,212,True,2025-04-07 17:57:54,R_7ozS2oG3LOadvUW,anonymous,EN,0.8999999761581421,Yes,Yes,31,Male,United States of America,California,First Officer,Legacy/Mainline Part 121 Airline,7,4500,Never served in the military,2,1,3,6,4,5,2,3,4,5,1,6,3,5,4,1,6,2,2,3,1,5,4,4,2,1,3,4,2,1,5,3,4,5,2,3,1,No,,
+2025-04-16 08:46:29,2025-04-16 08:46:52,IP Address,9,22,False,2025-04-19 08:46:54,R_7NvvAJCXxWnJYcN,anonymous,EN,1,Yes,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-21 16:48:15,2025-04-21 16:50:28,IP Address,55,133,False,2025-04-24 16:50:29,R_5psySgPblGl5KFv,anonymous,EN,0.5,Yes,Yes,52,Male,United States of America,New Mexico,First Officer,Charter/Fractional (Part 135/91K),2,3800,Previously served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2025-04-29 13:08:43,2025-04-29 13:10:17,IP Address,55,94,False,2025-05-02 13:10:20,R_1iqA4QX3Q68TCVZ,anonymous,EN,1,Yes,Yes,30,Male,United States of America,Minnesota,First Officer,Regional Airline,3,2000,Never served in the military,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
