@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 3
 params:
-  data_file: "data/retention.csv"
+  data_file: "data/processed/retention.csv"
 ---
 
 ## SETUP

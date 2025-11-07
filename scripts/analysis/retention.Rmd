@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 3
 params:
-  data_file: "data/retention.csv"
+  data_file: "data/processed/retention.csv"
 ---
 
 ```{r setup, include = FALSE}
@@ -84,7 +84,7 @@ cat("**Total records in file:**", total_records,
 ```
 
 ```{r write-clean, echo = TRUE}
-write_csv(included_data, here("data/retention_cleaned.csv"))
+write_csv(included_data, here("data/processed/retention_cleaned.csv"))
 ```
 
 \#`{r preview-clean, echo = FALSE} #knitr::kable(head(included_data), caption = "Preview of Cleaned Data") #`
