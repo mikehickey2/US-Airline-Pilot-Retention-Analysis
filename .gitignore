@@ -28,3 +28,6 @@ renv/staging/
 # data/raw/*.csv
 # data/raw/*.xlsx
 # !data/raw/.gitkeep
+
+/.quarto/
+**/*.quarto_ipynb
