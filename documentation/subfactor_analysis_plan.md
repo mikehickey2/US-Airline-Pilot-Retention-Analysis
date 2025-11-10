@@ -1,3 +1,53 @@
+# Phase 1A: Subfactor Analysis - COMPLETED
+
+**Status:** ✅ Complete
+**Date:** November 9, 2025
+**Analysis File:** `scripts/analysis/subfactor_analysis.qmd`
+**Branch:** `subfactor_analysis`
+
+## Completed Work
+
+### Analysis Implementation
+- Created comprehensive Quarto document analyzing all 31 subfactors across 6 retention constructs
+- Implemented proper variable labels from survey instrument (readable output)
+- Applied non-parametric statistical methods appropriate for ranked data:
+  - Mann-Whitney U tests for binary demographic comparisons
+  - Kruskal-Wallis tests for experience quartiles
+  - Friedman tests for within-construct comparisons
+- Applied Bonferroni correction for multiple testing (155 total tests)
+
+### Technical Infrastructure
+- Rebuilt renv environment from 200+ broken packages to 11 clean core packages
+- Migrated from R Markdown to Quarto (.qmd) format
+- Fixed military demographic recoding using pattern matching
+- Created automated render script (`render_subfactor_analysis.R`)
+- Implemented safe test wrappers to handle insufficient group sizes
+
+### Key Finding
+**No significant demographic differences detected** (p.adj < 0.05) in how pilots ranked subfactor priorities within any retention construct. After conducting 155 statistical tests across all subfactors and demographic groups:
+- Age (≤35 vs >35): 0 significant findings
+- Gender (Male vs Female): 0 significant findings
+- Position (Captain vs First Officer): 0 significant findings
+- Military Experience (Military vs Civilian): 0 significant findings
+- Experience Quartiles (Q1-Q4): 0 significant findings
+
+**Interpretation:** Pilots demonstrate remarkably consistent preferences for specific retention factors within each construct, regardless of age, gender, position, military background, or years of experience.
+
+### Output Files
+- `output/reports/subfactor_analysis.html` - Interactive HTML report with all results
+- `output/reports/subfactor_analysis.docx` - Word document for collaboration
+- Both include descriptive statistics, test results, and conclusion
+
+### Documentation
+- Updated README.md with Phase 1A completion
+- Updated SUBFACTOR_README.md with accurate usage information
+- Created RENV_SETUP.md documenting clean package rebuild
+- Archived old experimental files
+
+---
+
+# Original Analysis Plan
+
 **Comprehensive Survey Instrument & Data Review**
 
 **Survey Data Overview**

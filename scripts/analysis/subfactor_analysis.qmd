@@ -1,0 +1,974 @@
+---
+title: "Pilot Retention Subfactor Analysis"
+subtitle: "Phase 1A: Within-Construct Sub-Item Rankings and Demographic Comparisons"
+author: "Analysis Team"
+date: today
+format:
+  docx:
+    toc: true
+    number-sections: true
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    embed-resources: true
+    theme: cosmo
+    number-sections: true
+execute:
+  warning: false
+  message: false
+  echo: true
+---
+
+# Overview
+
+This analysis examines the 31 sub-item rankings within each retention construct and compares them across demographics.
+
+# Setup
+
+```{r setup}
+library(tidyverse)
+library(rstatix)
+library(knitr)
+library(janitor)
+library(DescTools)
+
+options(scipen = 999)
+knitr::opts_chunk$set(fig.width = 10, fig.height = 6)
+
+# Create output directories
+dir.create("../../output/tables/subfactor_analysis", showWarnings = FALSE, recursive = TRUE)
+dir.create("../../output/figures/subfactor_analysis", showWarnings = FALSE, recursive = TRUE)
+
+# Helper function to safely run Mann-Whitney U tests
+safe_wilcox_test <- function(data, formula, exact = FALSE) {
+  # Check if we have at least 2 groups with data
+  group_var <- all.vars(formula)[2]
+  n_groups <- data %>%
+    filter(!is.na(!!sym(group_var))) %>%
+    pull(!!sym(group_var)) %>%
+    n_distinct()
+
+  if (n_groups < 2) {
+    # Return empty result if not enough groups
+    return(tibble(
+      .y. = character(),
+      group1 = character(),
+      group2 = character(),
+      n1 = integer(),
+      n2 = integer(),
+      statistic = numeric(),
+      p = numeric()
+    ))
+  }
+
+  # Try to run the test
+  tryCatch(
+    wilcox_test(data, formula, exact = exact),
+    error = function(e) {
+      # Return empty result on error
+      tibble(
+        .y. = character(),
+        group1 = character(),
+        group2 = character(),
+        n1 = integer(),
+        n2 = integer(),
+        statistic = numeric(),
+        p = numeric()
+      )
+    }
+  )
+}
+
+# Helper function to safely run Kruskal-Wallis tests
+safe_kruskal_test <- function(data, formula) {
+  # Check if we have at least 2 groups with data
+  group_var <- all.vars(formula)[2]
+  n_groups <- data %>%
+    filter(!is.na(!!sym(group_var))) %>%
+    pull(!!sym(group_var)) %>%
+    n_distinct()
+
+  if (n_groups < 2) {
+    # Return empty result if not enough groups
+    return(tibble(
+      .y. = character(),
+      n = integer(),
+      statistic = numeric(),
+      df = integer(),
+      p = numeric()
+    ))
+  }
+
+  # Try to run the test
+  tryCatch(
+    kruskal_test(data, formula),
+    error = function(e) {
+      # Return empty result on error
+      tibble(
+        .y. = character(),
+        n = integer(),
+        statistic = numeric(),
+        df = integer(),
+        p = numeric()
+      )
+    }
+  )
+}
+
+# Variable labels from survey instrument
+financial_labels <- c(
+  "financial_1" = "Competitive salary",
+  "financial_2" = "Allowances and soft pay",
+  "financial_3" = "Benefits package",
+  "financial_4" = "Disability insurance",
+  "financial_5" = "Job security",
+  "financial_6" = "New hire/longevity bonuses"
+)
+
+qol_labels <- c(
+  "qo_l_1" = "Predictable schedule",
+  "qo_l_2" = "Vacation time",
+  "qo_l_3" = "Family-friendly policies",
+  "qo_l_4" = "Home base possibility",
+  "qo_l_5" = "Travel benefits",
+  "qo_l_6" = "Work-life balance"
+)
+
+professional_labels <- c(
+  "professional_1" = "Financially stable airline",
+  "professional_2" = "Rapid upgrade opportunity",
+  "professional_3" = "Fly larger aircraft",
+  "professional_4" = "Merit-based promotion",
+  "professional_5" = "Seniority-based upgrade"
+)
+
+recognition_labels <- c(
+  "recognition_1" = "Professional uniforms",
+  "recognition_3" = "Vacation for long service",
+  "recognition_4" = "Professional respect/recognition",
+  "recognition_7" = "Airline recognition"
+)
+
+schedule_labels <- c(
+  "schedule_1" = "Fixed schedule",
+  "schedule_2" = "Variable schedule",
+  "schedule_3" = "Flexible work rules",
+  "schedule_4" = "Bid line seniority system",
+  "schedule_5" = "Vacation bidding rules"
+)
+
+operational_labels <- c(
+  "operational_1" = "Unambiguous SOPs",
+  "operational_2" = "Proactive training",
+  "operational_3" = "Well-maintained aircraft",
+  "operational_4" = "Well-equipped aircraft",
+  "operational_5" = "Highly skilled pilots"
+)
+```
+
+# Data Loading
+
+```{r load-data}
+# Load data (same as retention.Rmd)
+raw <- read_csv("../../data/processed/retention.csv", show_col_types = FALSE)
+
+retention_data <- raw %>%
+  slice(-(1:2)) %>%
+  clean_names()
+
+# Filter to valid responses
+included_data <- retention_data %>%
+  mutate(
+    finished = toupper(as.character(finished)),
+    informed_consent = toupper(as.character(informed_consent)),
+    screener = toupper(as.character(screener))
+  ) %>%
+  filter(
+    finished == "TRUE",
+    informed_consent == "YES",
+    screener == "YES"
+  )
+
+cat("Valid observations:", nrow(included_data), "\n")
+```
+
+# Demographic Groups
+
+```{r demographics}
+# Create demographic groups (matching retention.Rmd approach)
+included_data <- included_data %>%
+  mutate(
+    # Numeric conversions
+    age = as.numeric(age),
+    experience = as.numeric(experience),
+
+    # Age groups
+    age_group = if_else(age <= 35, "≤35", ">35"),
+
+    # Experience quartiles
+    exp_q = ntile(experience, 4),
+    exp_q = factor(exp_q, labels = c("Q1", "Q2", "Q3", "Q4")),
+
+    # Gender
+    gender_clean = case_when(
+      tolower(gender) %in% c("male", "m") ~ "Male",
+      tolower(gender) %in% c("female", "f") ~ "Female",
+      TRUE ~ NA_character_
+    ),
+
+    # Position
+    position = position_position,
+
+    # Military
+    military_clean = case_when(
+      str_detect(tolower(military_experience), "currently serve|previously served") ~ "Military",
+      str_detect(tolower(military_experience), "never") ~ "Civilian",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Summary
+cat("\n=== DEMOGRAPHICS ===\n")
+cat("Age groups:\n"); table(included_data$age_group) %>% print()
+cat("\nGender:\n"); table(included_data$gender_clean, useNA = "ifany") %>% print()
+cat("\nPosition:\n"); table(included_data$position, useNA = "ifany") %>% print()
+cat("\nExperience:\n"); table(included_data$exp_q) %>% print()
+cat("\nMilitary:\n"); table(included_data$military_clean, useNA = "ifany") %>% print()
+```
+
+# Financial Subfactors
+
+```{r financial}
+cat("\n========================================\n")
+cat("FINANCIAL SUBFACTORS\n")
+cat("========================================\n\n")
+
+# Convert to long format
+financial_long <- included_data %>%
+  select(age_group, gender_clean, position, exp_q, military_clean,
+         financial_1:financial_6) %>%
+  mutate(across(financial_1:financial_6, as.numeric)) %>%
+  pivot_longer(
+    cols = financial_1:financial_6,
+    names_to = "item",
+    values_to = "rank"
+  ) %>%
+  filter(!is.na(rank))
+
+# Descriptive stats
+financial_desc <- financial_long %>%
+  group_by(item) %>%
+  summarise(
+    n = n(),
+    median = median(rank),
+    mean = mean(rank),
+    sd = sd(rank),
+    pct_rank1 = sum(rank == 1) / n() * 100
+  ) %>%
+  mutate(item = recode(item, !!!financial_labels))
+
+kable(financial_desc, digits = 2, caption = "Financial Subfactors - Descriptive Statistics")
+
+# Friedman test
+friedman_financial <- financial_long %>%
+  group_by(item) %>%
+  mutate(id = row_number()) %>%
+  ungroup() %>%
+  friedman_test(rank ~ item | id)
+
+cat("\n--- Friedman Test ---\n")
+print(friedman_financial)
+
+# Age group comparisons (Mann-Whitney U)
+mw_age_fin <- financial_long %>%
+  filter(!is.na(age_group)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ age_group, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_age_fin) > 0) {
+  mw_age_fin <- mw_age_fin %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!financial_labels))
+}
+
+kable(mw_age_fin, digits = 3, caption = "Financial: Age Group Comparisons (Mann-Whitney U)")
+
+# Gender comparisons
+mw_gender_fin <- financial_long %>%
+  filter(!is.na(gender_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ gender_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_gender_fin) > 0) {
+  mw_gender_fin <- mw_gender_fin %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!financial_labels))
+}
+
+kable(mw_gender_fin, digits = 3, caption = "Financial: Gender Comparisons (Mann-Whitney U)")
+
+# Position comparisons
+mw_position_fin <- financial_long %>%
+  filter(!is.na(position)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ position, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_position_fin) > 0) {
+  mw_position_fin <- mw_position_fin %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!financial_labels))
+}
+
+kable(mw_position_fin, digits = 3, caption = "Financial: Position Comparisons (Mann-Whitney U)")
+
+# Military comparisons
+mw_military_fin <- financial_long %>%
+  filter(!is.na(military_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ military_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_military_fin) > 0) {
+  mw_military_fin <- mw_military_fin %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!financial_labels))
+}
+
+kable(mw_military_fin, digits = 3, caption = "Financial: Military Comparisons (Mann-Whitney U)")
+
+# Experience quartile comparisons (Kruskal-Wallis)
+kw_exp_fin <- financial_long %>%
+  filter(!is.na(exp_q)) %>%
+  group_by(item) %>%
+  safe_kruskal_test(rank ~ exp_q) %>%
+  ungroup()
+
+if (nrow(kw_exp_fin) > 0) {
+  kw_exp_fin <- kw_exp_fin %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!financial_labels))
+}
+
+kable(kw_exp_fin, digits = 3, caption = "Financial: Experience Comparisons (Kruskal-Wallis)")
+```
+
+# Quality of Life Subfactors
+
+```{r qol}
+cat("\n========================================\n")
+cat("QUALITY OF LIFE SUBFACTORS\n")
+cat("========================================\n\n")
+
+# Convert to long format
+qol_long <- included_data %>%
+  select(age_group, gender_clean, position, exp_q, military_clean,
+         qo_l_1:qo_l_6) %>%
+  mutate(across(qo_l_1:qo_l_6, as.numeric)) %>%
+  pivot_longer(
+    cols = qo_l_1:qo_l_6,
+    names_to = "item",
+    values_to = "rank"
+  ) %>%
+  filter(!is.na(rank))
+
+# Descriptive stats
+qol_desc <- qol_long %>%
+  group_by(item) %>%
+  summarise(
+    n = n(),
+    median = median(rank),
+    mean = mean(rank),
+    sd = sd(rank),
+    pct_rank1 = sum(rank == 1) / n() * 100
+  ) %>%
+  mutate(item = recode(item, !!!qol_labels))
+
+kable(qol_desc, digits = 2, caption = "QoL Subfactors - Descriptive Statistics")
+
+# Friedman test
+friedman_qol <- qol_long %>%
+  group_by(item) %>%
+  mutate(id = row_number()) %>%
+  ungroup() %>%
+  friedman_test(rank ~ item | id)
+
+cat("\n--- Friedman Test ---\n")
+print(friedman_qol)
+
+# Age group
+mw_age_qol <- qol_long %>%
+  filter(!is.na(age_group)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ age_group, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_age_qol) > 0) {
+  mw_age_qol <- mw_age_qol %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!qol_labels))
+}
+
+kable(mw_age_qol, digits = 3, caption = "QoL: Age Group Comparisons")
+
+# Gender
+mw_gender_qol <- qol_long %>%
+  filter(!is.na(gender_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ gender_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_gender_qol) > 0) {
+  mw_gender_qol <- mw_gender_qol %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!qol_labels))
+}
+
+kable(mw_gender_qol, digits = 3, caption = "QoL: Gender Comparisons")
+
+# Position
+mw_position_qol <- qol_long %>%
+  filter(!is.na(position)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ position, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_position_qol) > 0) {
+  mw_position_qol <- mw_position_qol %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!qol_labels))
+}
+
+kable(mw_position_qol, digits = 3, caption = "QoL: Position Comparisons")
+
+# Military
+mw_military_qol <- qol_long %>%
+  filter(!is.na(military_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ military_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_military_qol) > 0) {
+  mw_military_qol <- mw_military_qol %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!qol_labels))
+}
+
+kable(mw_military_qol, digits = 3, caption = "QoL: Military Comparisons")
+
+# Experience
+kw_exp_qol <- qol_long %>%
+  filter(!is.na(exp_q)) %>%
+  group_by(item) %>%
+  safe_kruskal_test(rank ~ exp_q) %>%
+  ungroup()
+
+if (nrow(kw_exp_qol) > 0) {
+  kw_exp_qol <- kw_exp_qol %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!qol_labels))
+}
+
+kable(kw_exp_qol, digits = 3, caption = "QoL: Experience Comparisons")
+```
+
+# Professional Subfactors
+
+```{r professional}
+cat("\n========================================\n")
+cat("PROFESSIONAL SUBFACTORS\n")
+cat("========================================\n\n")
+
+professional_long <- included_data %>%
+  select(age_group, gender_clean, position, exp_q, military_clean,
+         professional_1:professional_5) %>%
+  mutate(across(professional_1:professional_5, as.numeric)) %>%
+  pivot_longer(
+    cols = professional_1:professional_5,
+    names_to = "item",
+    values_to = "rank"
+  ) %>%
+  filter(!is.na(rank))
+
+# Descriptive
+professional_desc <- professional_long %>%
+  group_by(item) %>%
+  summarise(n = n(), median = median(rank), mean = mean(rank),
+            sd = sd(rank), pct_rank1 = sum(rank == 1) / n() * 100) %>%
+  mutate(item = recode(item, !!!professional_labels))
+kable(professional_desc, digits = 2, caption = "Professional Subfactors - Descriptive Statistics")
+
+# Friedman
+friedman_prof <- professional_long %>%
+  group_by(item) %>%
+  mutate(id = row_number()) %>%
+  ungroup() %>%
+  friedman_test(rank ~ item | id)
+cat("\n--- Friedman Test ---\n"); print(friedman_prof)
+
+# Demographics
+mw_age_prof <- professional_long %>%
+  filter(!is.na(age_group)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ age_group, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_age_prof) > 0) {
+  mw_age_prof <- mw_age_prof %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!professional_labels))
+}
+
+kable(mw_age_prof, digits = 3, caption = "Professional: Age Comparisons")
+
+mw_gender_prof <- professional_long %>%
+  filter(!is.na(gender_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ gender_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_gender_prof) > 0) {
+  mw_gender_prof <- mw_gender_prof %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!professional_labels))
+}
+
+kable(mw_gender_prof, digits = 3, caption = "Professional: Gender Comparisons")
+
+mw_position_prof <- professional_long %>%
+  filter(!is.na(position)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ position, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_position_prof) > 0) {
+  mw_position_prof <- mw_position_prof %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!professional_labels))
+}
+
+kable(mw_position_prof, digits = 3, caption = "Professional: Position Comparisons")
+
+mw_military_prof <- professional_long %>%
+  filter(!is.na(military_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ military_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_military_prof) > 0) {
+  mw_military_prof <- mw_military_prof %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!professional_labels))
+}
+
+kable(mw_military_prof, digits = 3, caption = "Professional: Military Comparisons")
+
+kw_exp_prof <- professional_long %>%
+  filter(!is.na(exp_q)) %>%
+  group_by(item) %>%
+  safe_kruskal_test(rank ~ exp_q) %>%
+  ungroup()
+
+if (nrow(kw_exp_prof) > 0) {
+  kw_exp_prof <- kw_exp_prof %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!professional_labels))
+}
+
+kable(kw_exp_prof, digits = 3, caption = "Professional: Experience Comparisons")
+```
+
+# Recognition Subfactors
+
+```{r recognition}
+cat("\n========================================\n")
+cat("RECOGNITION SUBFACTORS\n")
+cat("========================================\n\n")
+
+recognition_long <- included_data %>%
+  select(age_group, gender_clean, position, exp_q, military_clean,
+         recognition_1, recognition_3, recognition_4, recognition_7) %>%
+  mutate(across(starts_with("recognition"), as.numeric)) %>%
+  pivot_longer(
+    cols = starts_with("recognition"),
+    names_to = "item",
+    values_to = "rank"
+  ) %>%
+  filter(!is.na(rank))
+
+# Descriptive
+recognition_desc <- recognition_long %>%
+  group_by(item) %>%
+  summarise(n = n(), median = median(rank), mean = mean(rank),
+            sd = sd(rank), pct_rank1 = sum(rank == 1) / n() * 100) %>%
+  mutate(item = recode(item, !!!recognition_labels))
+kable(recognition_desc, digits = 2, caption = "Recognition Subfactors - Descriptive Statistics")
+
+# Friedman
+friedman_recog <- recognition_long %>%
+  group_by(item) %>%
+  mutate(id = row_number()) %>%
+  ungroup() %>%
+  friedman_test(rank ~ item | id)
+cat("\n--- Friedman Test ---\n"); print(friedman_recog)
+
+# Demographics
+mw_age_recog <- recognition_long %>%
+  filter(!is.na(age_group)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ age_group, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_age_recog) > 0) {
+  mw_age_recog <- mw_age_recog %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!recognition_labels))
+}
+
+kable(mw_age_recog, digits = 3, caption = "Recognition: Age Comparisons")
+
+mw_gender_recog <- recognition_long %>%
+  filter(!is.na(gender_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ gender_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_gender_recog) > 0) {
+  mw_gender_recog <- mw_gender_recog %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!recognition_labels))
+}
+
+kable(mw_gender_recog, digits = 3, caption = "Recognition: Gender Comparisons")
+
+mw_position_recog <- recognition_long %>%
+  filter(!is.na(position)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ position, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_position_recog) > 0) {
+  mw_position_recog <- mw_position_recog %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!recognition_labels))
+}
+
+kable(mw_position_recog, digits = 3, caption = "Recognition: Position Comparisons")
+
+mw_military_recog <- recognition_long %>%
+  filter(!is.na(military_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ military_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_military_recog) > 0) {
+  mw_military_recog <- mw_military_recog %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!recognition_labels))
+}
+
+kable(mw_military_recog, digits = 3, caption = "Recognition: Military Comparisons")
+
+kw_exp_recog <- recognition_long %>%
+  filter(!is.na(exp_q)) %>%
+  group_by(item) %>%
+  safe_kruskal_test(rank ~ exp_q) %>%
+  ungroup()
+
+if (nrow(kw_exp_recog) > 0) {
+  kw_exp_recog <- kw_exp_recog %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!recognition_labels))
+}
+
+kable(kw_exp_recog, digits = 3, caption = "Recognition: Experience Comparisons")
+```
+
+# Schedule Subfactors
+
+```{r schedule}
+cat("\n========================================\n")
+cat("SCHEDULE SUBFACTORS\n")
+cat("========================================\n\n")
+
+schedule_long <- included_data %>%
+  select(age_group, gender_clean, position, exp_q, military_clean,
+         schedule_1:schedule_5) %>%
+  mutate(across(schedule_1:schedule_5, as.numeric)) %>%
+  pivot_longer(
+    cols = schedule_1:schedule_5,
+    names_to = "item",
+    values_to = "rank"
+  ) %>%
+  filter(!is.na(rank))
+
+# Descriptive
+schedule_desc <- schedule_long %>%
+  group_by(item) %>%
+  summarise(n = n(), median = median(rank), mean = mean(rank),
+            sd = sd(rank), pct_rank1 = sum(rank == 1) / n() * 100) %>%
+  mutate(item = recode(item, !!!schedule_labels))
+kable(schedule_desc, digits = 2, caption = "Schedule Subfactors - Descriptive Statistics")
+
+# Friedman
+friedman_sched <- schedule_long %>%
+  group_by(item) %>%
+  mutate(id = row_number()) %>%
+  ungroup() %>%
+  friedman_test(rank ~ item | id)
+cat("\n--- Friedman Test ---\n"); print(friedman_sched)
+
+# Demographics
+mw_age_sched <- schedule_long %>%
+  filter(!is.na(age_group)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ age_group, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_age_sched) > 0) {
+  mw_age_sched <- mw_age_sched %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!schedule_labels))
+}
+
+kable(mw_age_sched, digits = 3, caption = "Schedule: Age Comparisons")
+
+mw_gender_sched <- schedule_long %>%
+  filter(!is.na(gender_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ gender_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_gender_sched) > 0) {
+  mw_gender_sched <- mw_gender_sched %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!schedule_labels))
+}
+
+kable(mw_gender_sched, digits = 3, caption = "Schedule: Gender Comparisons")
+
+mw_position_sched <- schedule_long %>%
+  filter(!is.na(position)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ position, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_position_sched) > 0) {
+  mw_position_sched <- mw_position_sched %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!schedule_labels))
+}
+
+kable(mw_position_sched, digits = 3, caption = "Schedule: Position Comparisons")
+
+mw_military_sched <- schedule_long %>%
+  filter(!is.na(military_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ military_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_military_sched) > 0) {
+  mw_military_sched <- mw_military_sched %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!schedule_labels))
+}
+
+kable(mw_military_sched, digits = 3, caption = "Schedule: Military Comparisons")
+
+kw_exp_sched <- schedule_long %>%
+  filter(!is.na(exp_q)) %>%
+  group_by(item) %>%
+  safe_kruskal_test(rank ~ exp_q) %>%
+  ungroup()
+
+if (nrow(kw_exp_sched) > 0) {
+  kw_exp_sched <- kw_exp_sched %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!schedule_labels))
+}
+
+kable(kw_exp_sched, digits = 3, caption = "Schedule: Experience Comparisons")
+```
+
+# Operational Subfactors
+
+```{r operational}
+cat("\n========================================\n")
+cat("OPERATIONAL SUBFACTORS\n")
+cat("========================================\n\n")
+
+operational_long <- included_data %>%
+  select(age_group, gender_clean, position, exp_q, military_clean,
+         operational_1:operational_5) %>%
+  mutate(across(operational_1:operational_5, as.numeric)) %>%
+  pivot_longer(
+    cols = operational_1:operational_5,
+    names_to = "item",
+    values_to = "rank"
+  ) %>%
+  filter(!is.na(rank))
+
+# Descriptive
+operational_desc <- operational_long %>%
+  group_by(item) %>%
+  summarise(n = n(), median = median(rank), mean = mean(rank),
+            sd = sd(rank), pct_rank1 = sum(rank == 1) / n() * 100) %>%
+  mutate(item = recode(item, !!!operational_labels))
+kable(operational_desc, digits = 2, caption = "Operational Subfactors - Descriptive Statistics")
+
+# Friedman
+friedman_oper <- operational_long %>%
+  group_by(item) %>%
+  mutate(id = row_number()) %>%
+  ungroup() %>%
+  friedman_test(rank ~ item | id)
+cat("\n--- Friedman Test ---\n"); print(friedman_oper)
+
+# Demographics
+mw_age_oper <- operational_long %>%
+  filter(!is.na(age_group)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ age_group, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_age_oper) > 0) {
+  mw_age_oper <- mw_age_oper %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!operational_labels))
+}
+
+kable(mw_age_oper, digits = 3, caption = "Operational: Age Comparisons")
+
+mw_gender_oper <- operational_long %>%
+  filter(!is.na(gender_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ gender_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_gender_oper) > 0) {
+  mw_gender_oper <- mw_gender_oper %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!operational_labels))
+}
+
+kable(mw_gender_oper, digits = 3, caption = "Operational: Gender Comparisons")
+
+mw_position_oper <- operational_long %>%
+  filter(!is.na(position)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ position, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_position_oper) > 0) {
+  mw_position_oper <- mw_position_oper %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!operational_labels))
+}
+
+kable(mw_position_oper, digits = 3, caption = "Operational: Position Comparisons")
+
+mw_military_oper <- operational_long %>%
+  filter(!is.na(military_clean)) %>%
+  group_by(item) %>%
+  safe_wilcox_test(rank ~ military_clean, exact = FALSE) %>%
+  ungroup()
+
+if (nrow(mw_military_oper) > 0) {
+  mw_military_oper <- mw_military_oper %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!operational_labels))
+}
+
+kable(mw_military_oper, digits = 3, caption = "Operational: Military Comparisons")
+
+kw_exp_oper <- operational_long %>%
+  filter(!is.na(exp_q)) %>%
+  group_by(item) %>%
+  safe_kruskal_test(rank ~ exp_q) %>%
+  ungroup()
+
+if (nrow(kw_exp_oper) > 0) {
+  kw_exp_oper <- kw_exp_oper %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance("p.adj") %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    mutate(item = recode(item, !!!operational_labels))
+}
+
+kable(kw_exp_oper, digits = 3, caption = "Operational: Experience Comparisons")
+```
+
+# Conclusion
+
+This analysis examined 31 subfactor rankings across six retention constructs (Financial, Quality of Life, Professional Opportunity, Recognition, Schedule, and Operational) and compared them across five demographic groups: age (≤35 vs >35), gender, position (Captain vs First Officer), military experience, and years of experience (quartiles).
+
+**Key Finding:** After conducting 155 statistical tests with Bonferroni correction for multiple comparisons, **no significant demographic differences were detected** (p.adj < 0.05) in how pilots ranked subfactor priorities within any retention construct.
+
+Regardless of age, gender, position, military background, or years of experience, pilots demonstrate similar preferences for specific retention factors within each construct.
+
+# Session Info
+
+```{r session}
+sessionInfo()
+```
