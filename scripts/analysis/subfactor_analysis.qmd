@@ -40,7 +40,7 @@ knitr::opts_chunk$set(fig.width = 10, fig.height = 6)
 dir.create("../../output/tables/subfactor_analysis", showWarnings = FALSE, recursive = TRUE)
 dir.create("../../output/figures/subfactor_analysis", showWarnings = FALSE, recursive = TRUE)
 
-# Helper function to safely run Mann-Whitney U tests
+# Helper function to safely run Mann-Whitney U tests with effect sizes
 safe_wilcox_test <- function(data, formula, exact = FALSE) {
   # Check if we have at least 2 groups with data
   group_var <- all.vars(formula)[2]
@@ -58,29 +58,68 @@ safe_wilcox_test <- function(data, formula, exact = FALSE) {
       n1 = integer(),
       n2 = integer(),
       statistic = numeric(),
-      p = numeric()
+      p = numeric(),
+      effsize = numeric(),
+      magnitude = character()
     ))
   }
 
-  # Try to run the test
-  tryCatch(
-    wilcox_test(data, formula, exact = exact),
-    error = function(e) {
-      # Return empty result on error
-      tibble(
-        .y. = character(),
-        group1 = character(),
-        group2 = character(),
-        n1 = integer(),
-        n2 = integer(),
-        statistic = numeric(),
-        p = numeric()
+  # Run the test (this should succeed for all valid items)
+  test_result <- tryCatch({
+    wilcox_test(data, formula, exact = exact)
+  },
+  error = function(e) {
+    # Return empty on test failure
+    return(tibble(
+      .y. = character(),
+      group1 = character(),
+      group2 = character(),
+      n1 = integer(),
+      n2 = integer(),
+      statistic = numeric(),
+      p = numeric()
+    ))
+  })
+
+  # If test failed, return empty
+  if (nrow(test_result) == 0) {
+    return(tibble(
+      .y. = character(),
+      group1 = character(),
+      group2 = character(),
+      n1 = integer(),
+      n2 = integer(),
+      statistic = numeric(),
+      p = numeric(),
+      effsize = numeric(),
+      magnitude = character()
+    ))
+  }
+
+  # Try to compute effect sizes (may fail for sparse items)
+  effsize_result <- tryCatch({
+    wilcox_effsize(data, formula)
+  },
+  error = function(e) {
+    # Return NA effect sizes for items that fail
+    test_result %>%
+      select(.y.) %>%
+      distinct() %>%
+      mutate(
+        effsize = NA_real_,
+        magnitude = NA_character_
       )
-    }
-  )
+  })
+
+  # Combine results with proper join
+  test_result %>%
+    left_join(
+      effsize_result %>% select(.y., effsize, magnitude),
+      by = ".y."
+    )
 }
 
-# Helper function to safely run Kruskal-Wallis tests
+# Helper function to safely run Kruskal-Wallis tests with effect sizes
 safe_kruskal_test <- function(data, formula) {
   # Check if we have at least 2 groups with data
   group_var <- all.vars(formula)[2]
@@ -96,24 +135,61 @@ safe_kruskal_test <- function(data, formula) {
       n = integer(),
       statistic = numeric(),
       df = integer(),
-      p = numeric()
+      p = numeric(),
+      effsize = numeric(),
+      magnitude = character()
     ))
   }
 
-  # Try to run the test
-  tryCatch(
-    kruskal_test(data, formula),
-    error = function(e) {
-      # Return empty result on error
-      tibble(
-        .y. = character(),
-        n = integer(),
-        statistic = numeric(),
-        df = integer(),
-        p = numeric()
+  # Run the test (this should succeed for all valid items)
+  test_result <- tryCatch({
+    kruskal_test(data, formula)
+  },
+  error = function(e) {
+    # Return empty on test failure
+    return(tibble(
+      .y. = character(),
+      n = integer(),
+      statistic = numeric(),
+      df = integer(),
+      p = numeric()
+    ))
+  })
+
+  # If test failed, return empty
+  if (nrow(test_result) == 0) {
+    return(tibble(
+      .y. = character(),
+      n = integer(),
+      statistic = numeric(),
+      df = integer(),
+      p = numeric(),
+      effsize = numeric(),
+      magnitude = character()
+    ))
+  }
+
+  # Try to compute effect sizes (may fail for sparse items)
+  effsize_result <- tryCatch({
+    kruskal_effsize(data, formula)
+  },
+  error = function(e) {
+    # Return NA effect sizes for items that fail
+    test_result %>%
+      select(.y.) %>%
+      distinct() %>%
+      mutate(
+        effsize = NA_real_,
+        magnitude = NA_character_
       )
-    }
-  )
+  })
+
+  # Combine results with proper join
+  test_result %>%
+    left_join(
+      effsize_result %>% select(.y., effsize, magnitude),
+      by = ".y."
+    )
 }
 
 # Variable labels from survey instrument
@@ -275,8 +351,26 @@ kable(financial_desc, digits = 2, caption = "Financial Subfactors - Descriptive 
 friedman_financial <- financial_long %>%
   friedman_test(rank ~ item | respondent_id)
 
-cat("\n--- Friedman Test ---\n")
-print(friedman_financial)
+kable(friedman_financial, digits = 3, caption = "Financial: Friedman Test (Within-Construct Comparison)")
+
+# Median rank visualization
+financial_plot <- financial_desc %>%
+  mutate(item = fct_reorder(item, desc(median))) %>%
+  ggplot(aes(x = median, y = item)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  geom_text(aes(label = sprintf("%.1f", median)), hjust = -0.2, size = 3) +
+  labs(
+    title = "Financial Subfactor Priorities",
+    subtitle = "Median rank (lower = higher priority)",
+    x = "Median Rank",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+
+print(financial_plot)
+ggsave("../../output/figures/subfactor_analysis/financial_median_ranks.png",
+       financial_plot, width = 8, height = 5, dpi = 300)
 
 # Age group comparisons (Mann-Whitney U)
 mw_age_fin <- financial_long %>%
@@ -289,7 +383,7 @@ if (nrow(mw_age_fin) > 0) {
   mw_age_fin <- mw_age_fin %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -306,7 +400,7 @@ if (nrow(mw_gender_fin) > 0) {
   mw_gender_fin <- mw_gender_fin %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -323,7 +417,7 @@ if (nrow(mw_position_fin) > 0) {
   mw_position_fin <- mw_position_fin %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -340,7 +434,7 @@ if (nrow(mw_military_fin) > 0) {
   mw_military_fin <- mw_military_fin %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -357,11 +451,20 @@ if (nrow(kw_exp_fin) > 0) {
   kw_exp_fin <- kw_exp_fin %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
 kable(kw_exp_fin, digits = 3, caption = "Financial: Experience Comparisons (Kruskal-Wallis)")
+
+# Save tables to CSV
+write_csv(financial_desc, "../../output/tables/subfactor_analysis/financial_descriptive.csv")
+write_csv(friedman_financial, "../../output/tables/subfactor_analysis/financial_friedman.csv")
+if (nrow(mw_age_fin) > 0) write_csv(mw_age_fin, "../../output/tables/subfactor_analysis/financial_age.csv")
+if (nrow(mw_gender_fin) > 0) write_csv(mw_gender_fin, "../../output/tables/subfactor_analysis/financial_gender.csv")
+if (nrow(mw_position_fin) > 0) write_csv(mw_position_fin, "../../output/tables/subfactor_analysis/financial_position.csv")
+if (nrow(mw_military_fin) > 0) write_csv(mw_military_fin, "../../output/tables/subfactor_analysis/financial_military.csv")
+if (nrow(kw_exp_fin) > 0) write_csv(kw_exp_fin, "../../output/tables/subfactor_analysis/financial_experience.csv")
 ```
 
 # Quality of Life Subfactors
@@ -402,8 +505,26 @@ kable(qol_desc, digits = 2, caption = "QoL Subfactors - Descriptive Statistics")
 friedman_qol <- qol_long %>%
   friedman_test(rank ~ item | respondent_id)
 
-cat("\n--- Friedman Test ---\n")
-print(friedman_qol)
+kable(friedman_qol, digits = 3, caption = "QoL: Friedman Test (Within-Construct Comparison)")
+
+# Median rank visualization
+qol_plot <- qol_desc %>%
+  mutate(item = fct_reorder(item, desc(median))) %>%
+  ggplot(aes(x = median, y = item)) +
+  geom_col(fill = "forestgreen", alpha = 0.8) +
+  geom_text(aes(label = sprintf("%.1f", median)), hjust = -0.2, size = 3) +
+  labs(
+    title = "Quality of Life Subfactor Priorities",
+    subtitle = "Median rank (lower = higher priority)",
+    x = "Median Rank",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+
+print(qol_plot)
+ggsave("../../output/figures/subfactor_analysis/qol_median_ranks.png",
+       qol_plot, width = 8, height = 5, dpi = 300)
 
 # Age group
 mw_age_qol <- qol_long %>%
@@ -416,7 +537,7 @@ if (nrow(mw_age_qol) > 0) {
   mw_age_qol <- mw_age_qol %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -433,7 +554,7 @@ if (nrow(mw_gender_qol) > 0) {
   mw_gender_qol <- mw_gender_qol %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -450,7 +571,7 @@ if (nrow(mw_position_qol) > 0) {
   mw_position_qol <- mw_position_qol %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -467,7 +588,7 @@ if (nrow(mw_military_qol) > 0) {
   mw_military_qol <- mw_military_qol %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -484,11 +605,20 @@ if (nrow(kw_exp_qol) > 0) {
   kw_exp_qol <- kw_exp_qol %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
 kable(kw_exp_qol, digits = 3, caption = "QoL: Experience Comparisons")
+
+# Save tables to CSV
+write_csv(qol_desc, "../../output/tables/subfactor_analysis/qol_descriptive.csv")
+write_csv(friedman_qol, "../../output/tables/subfactor_analysis/qol_friedman.csv")
+if (nrow(mw_age_qol) > 0) write_csv(mw_age_qol, "../../output/tables/subfactor_analysis/qol_age.csv")
+if (nrow(mw_gender_qol) > 0) write_csv(mw_gender_qol, "../../output/tables/subfactor_analysis/qol_gender.csv")
+if (nrow(mw_position_qol) > 0) write_csv(mw_position_qol, "../../output/tables/subfactor_analysis/qol_position.csv")
+if (nrow(mw_military_qol) > 0) write_csv(mw_military_qol, "../../output/tables/subfactor_analysis/qol_military.csv")
+if (nrow(kw_exp_qol) > 0) write_csv(kw_exp_qol, "../../output/tables/subfactor_analysis/qol_experience.csv")
 ```
 
 # Professional Subfactors
@@ -521,7 +651,26 @@ kable(professional_desc, digits = 2, caption = "Professional Subfactors - Descri
 # Friedman
 friedman_prof <- professional_long %>%
   friedman_test(rank ~ item | respondent_id)
-cat("\n--- Friedman Test ---\n"); print(friedman_prof)
+kable(friedman_prof, digits = 3, caption = "Professional: Friedman Test (Within-Construct Comparison)")
+
+# Median rank visualization
+professional_plot <- professional_desc %>%
+  mutate(item = fct_reorder(item, desc(median))) %>%
+  ggplot(aes(x = median, y = item)) +
+  geom_col(fill = "darkorange", alpha = 0.8) +
+  geom_text(aes(label = sprintf("%.1f", median)), hjust = -0.2, size = 3) +
+  labs(
+    title = "Professional Opportunity Subfactor Priorities",
+    subtitle = "Median rank (lower = higher priority)",
+    x = "Median Rank",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+
+print(professional_plot)
+ggsave("../../output/figures/subfactor_analysis/professional_median_ranks.png",
+       professional_plot, width = 8, height = 5, dpi = 300)
 
 # Demographics
 mw_age_prof <- professional_long %>%
@@ -534,7 +683,7 @@ if (nrow(mw_age_prof) > 0) {
   mw_age_prof <- mw_age_prof %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -550,7 +699,7 @@ if (nrow(mw_gender_prof) > 0) {
   mw_gender_prof <- mw_gender_prof %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -566,7 +715,7 @@ if (nrow(mw_position_prof) > 0) {
   mw_position_prof <- mw_position_prof %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -582,7 +731,7 @@ if (nrow(mw_military_prof) > 0) {
   mw_military_prof <- mw_military_prof %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -598,11 +747,20 @@ if (nrow(kw_exp_prof) > 0) {
   kw_exp_prof <- kw_exp_prof %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
 kable(kw_exp_prof, digits = 3, caption = "Professional: Experience Comparisons")
+
+# Save tables to CSV
+write_csv(professional_desc, "../../output/tables/subfactor_analysis/professional_descriptive.csv")
+write_csv(friedman_prof, "../../output/tables/subfactor_analysis/professional_friedman.csv")
+if (nrow(mw_age_prof) > 0) write_csv(mw_age_prof, "../../output/tables/subfactor_analysis/professional_age.csv")
+if (nrow(mw_gender_prof) > 0) write_csv(mw_gender_prof, "../../output/tables/subfactor_analysis/professional_gender.csv")
+if (nrow(mw_position_prof) > 0) write_csv(mw_position_prof, "../../output/tables/subfactor_analysis/professional_position.csv")
+if (nrow(mw_military_prof) > 0) write_csv(mw_military_prof, "../../output/tables/subfactor_analysis/professional_military.csv")
+if (nrow(kw_exp_prof) > 0) write_csv(kw_exp_prof, "../../output/tables/subfactor_analysis/professional_experience.csv")
 ```
 
 # Recognition Subfactors
@@ -635,7 +793,26 @@ kable(recognition_desc, digits = 2, caption = "Recognition Subfactors - Descript
 # Friedman
 friedman_recog <- recognition_long %>%
   friedman_test(rank ~ item | respondent_id)
-cat("\n--- Friedman Test ---\n"); print(friedman_recog)
+kable(friedman_recog, digits = 3, caption = "Recognition: Friedman Test (Within-Construct Comparison)")
+
+# Median rank visualization
+recognition_plot <- recognition_desc %>%
+  mutate(item = fct_reorder(item, desc(median))) %>%
+  ggplot(aes(x = median, y = item)) +
+  geom_col(fill = "purple", alpha = 0.8) +
+  geom_text(aes(label = sprintf("%.1f", median)), hjust = -0.2, size = 3) +
+  labs(
+    title = "Recognition Subfactor Priorities",
+    subtitle = "Median rank (lower = higher priority)",
+    x = "Median Rank",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+
+print(recognition_plot)
+ggsave("../../output/figures/subfactor_analysis/recognition_median_ranks.png",
+       recognition_plot, width = 8, height = 5, dpi = 300)
 
 # Demographics
 mw_age_recog <- recognition_long %>%
@@ -648,7 +825,7 @@ if (nrow(mw_age_recog) > 0) {
   mw_age_recog <- mw_age_recog %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -664,7 +841,7 @@ if (nrow(mw_gender_recog) > 0) {
   mw_gender_recog <- mw_gender_recog %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -680,7 +857,7 @@ if (nrow(mw_position_recog) > 0) {
   mw_position_recog <- mw_position_recog %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -696,7 +873,7 @@ if (nrow(mw_military_recog) > 0) {
   mw_military_recog <- mw_military_recog %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -712,11 +889,20 @@ if (nrow(kw_exp_recog) > 0) {
   kw_exp_recog <- kw_exp_recog %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
 kable(kw_exp_recog, digits = 3, caption = "Recognition: Experience Comparisons")
+
+# Save tables to CSV
+write_csv(recognition_desc, "../../output/tables/subfactor_analysis/recognition_descriptive.csv")
+write_csv(friedman_recog, "../../output/tables/subfactor_analysis/recognition_friedman.csv")
+if (nrow(mw_age_recog) > 0) write_csv(mw_age_recog, "../../output/tables/subfactor_analysis/recognition_age.csv")
+if (nrow(mw_gender_recog) > 0) write_csv(mw_gender_recog, "../../output/tables/subfactor_analysis/recognition_gender.csv")
+if (nrow(mw_position_recog) > 0) write_csv(mw_position_recog, "../../output/tables/subfactor_analysis/recognition_position.csv")
+if (nrow(mw_military_recog) > 0) write_csv(mw_military_recog, "../../output/tables/subfactor_analysis/recognition_military.csv")
+if (nrow(kw_exp_recog) > 0) write_csv(kw_exp_recog, "../../output/tables/subfactor_analysis/recognition_experience.csv")
 ```
 
 # Schedule Subfactors
@@ -749,7 +935,26 @@ kable(schedule_desc, digits = 2, caption = "Schedule Subfactors - Descriptive St
 # Friedman
 friedman_sched <- schedule_long %>%
   friedman_test(rank ~ item | respondent_id)
-cat("\n--- Friedman Test ---\n"); print(friedman_sched)
+kable(friedman_sched, digits = 3, caption = "Schedule: Friedman Test (Within-Construct Comparison)")
+
+# Median rank visualization
+schedule_plot <- schedule_desc %>%
+  mutate(item = fct_reorder(item, desc(median))) %>%
+  ggplot(aes(x = median, y = item)) +
+  geom_col(fill = "firebrick", alpha = 0.8) +
+  geom_text(aes(label = sprintf("%.1f", median)), hjust = -0.2, size = 3) +
+  labs(
+    title = "Schedule Subfactor Priorities",
+    subtitle = "Median rank (lower = higher priority)",
+    x = "Median Rank",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+
+print(schedule_plot)
+ggsave("../../output/figures/subfactor_analysis/schedule_median_ranks.png",
+       schedule_plot, width = 8, height = 5, dpi = 300)
 
 # Demographics
 mw_age_sched <- schedule_long %>%
@@ -762,7 +967,7 @@ if (nrow(mw_age_sched) > 0) {
   mw_age_sched <- mw_age_sched %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -778,7 +983,7 @@ if (nrow(mw_gender_sched) > 0) {
   mw_gender_sched <- mw_gender_sched %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -794,7 +999,7 @@ if (nrow(mw_position_sched) > 0) {
   mw_position_sched <- mw_position_sched %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -810,7 +1015,7 @@ if (nrow(mw_military_sched) > 0) {
   mw_military_sched <- mw_military_sched %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -826,11 +1031,20 @@ if (nrow(kw_exp_sched) > 0) {
   kw_exp_sched <- kw_exp_sched %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
 kable(kw_exp_sched, digits = 3, caption = "Schedule: Experience Comparisons")
+
+# Save tables to CSV
+write_csv(schedule_desc, "../../output/tables/subfactor_analysis/schedule_descriptive.csv")
+write_csv(friedman_sched, "../../output/tables/subfactor_analysis/schedule_friedman.csv")
+if (nrow(mw_age_sched) > 0) write_csv(mw_age_sched, "../../output/tables/subfactor_analysis/schedule_age.csv")
+if (nrow(mw_gender_sched) > 0) write_csv(mw_gender_sched, "../../output/tables/subfactor_analysis/schedule_gender.csv")
+if (nrow(mw_position_sched) > 0) write_csv(mw_position_sched, "../../output/tables/subfactor_analysis/schedule_position.csv")
+if (nrow(mw_military_sched) > 0) write_csv(mw_military_sched, "../../output/tables/subfactor_analysis/schedule_military.csv")
+if (nrow(kw_exp_sched) > 0) write_csv(kw_exp_sched, "../../output/tables/subfactor_analysis/schedule_experience.csv")
 ```
 
 # Operational Subfactors
@@ -863,7 +1077,26 @@ kable(operational_desc, digits = 2, caption = "Operational Subfactors - Descript
 # Friedman
 friedman_oper <- operational_long %>%
   friedman_test(rank ~ item | respondent_id)
-cat("\n--- Friedman Test ---\n"); print(friedman_oper)
+kable(friedman_oper, digits = 3, caption = "Operational: Friedman Test (Within-Construct Comparison)")
+
+# Median rank visualization
+operational_plot <- operational_desc %>%
+  mutate(item = fct_reorder(item, desc(median))) %>%
+  ggplot(aes(x = median, y = item)) +
+  geom_col(fill = "darkslategray", alpha = 0.8) +
+  geom_text(aes(label = sprintf("%.1f", median)), hjust = -0.2, size = 3) +
+  labs(
+    title = "Operational Subfactor Priorities",
+    subtitle = "Median rank (lower = higher priority)",
+    x = "Median Rank",
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+
+print(operational_plot)
+ggsave("../../output/figures/subfactor_analysis/operational_median_ranks.png",
+       operational_plot, width = 8, height = 5, dpi = 300)
 
 # Demographics
 mw_age_oper <- operational_long %>%
@@ -876,7 +1109,7 @@ if (nrow(mw_age_oper) > 0) {
   mw_age_oper <- mw_age_oper %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -892,7 +1125,7 @@ if (nrow(mw_gender_oper) > 0) {
   mw_gender_oper <- mw_gender_oper %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -908,7 +1141,7 @@ if (nrow(mw_position_oper) > 0) {
   mw_position_oper <- mw_position_oper %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -924,7 +1157,7 @@ if (nrow(mw_military_oper) > 0) {
   mw_military_oper <- mw_military_oper %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -940,11 +1173,20 @@ if (nrow(kw_exp_oper) > 0) {
   kw_exp_oper <- kw_exp_oper %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif) %>%
+    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
 kable(kw_exp_oper, digits = 3, caption = "Operational: Experience Comparisons")
+
+# Save tables to CSV
+write_csv(operational_desc, "../../output/tables/subfactor_analysis/operational_descriptive.csv")
+write_csv(friedman_oper, "../../output/tables/subfactor_analysis/operational_friedman.csv")
+if (nrow(mw_age_oper) > 0) write_csv(mw_age_oper, "../../output/tables/subfactor_analysis/operational_age.csv")
+if (nrow(mw_gender_oper) > 0) write_csv(mw_gender_oper, "../../output/tables/subfactor_analysis/operational_gender.csv")
+if (nrow(mw_position_oper) > 0) write_csv(mw_position_oper, "../../output/tables/subfactor_analysis/operational_position.csv")
+if (nrow(mw_military_oper) > 0) write_csv(mw_military_oper, "../../output/tables/subfactor_analysis/operational_military.csv")
+if (nrow(kw_exp_oper) > 0) write_csv(kw_exp_oper, "../../output/tables/subfactor_analysis/operational_experience.csv")
 ```
 
 # Conclusion

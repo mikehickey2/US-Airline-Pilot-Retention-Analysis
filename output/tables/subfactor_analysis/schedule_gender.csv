@@ -1,0 +1,6 @@
+item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
+Fixed schedule,202.5,0.248,1,ns,NA,NA
+Variable schedule,387,0.0359,0.1795,ns,NA,NA
+Flexible work rules,229.5,0.489,1,ns,NA,NA
+Bid line seniority system,270.5,0.972,1,ns,NA,NA
+Vacation bidding rules,204,0.256,1,ns,NA,NA

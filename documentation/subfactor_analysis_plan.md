@@ -15,6 +15,14 @@
   - Kruskal-Wallis tests for experience quartiles
   - Friedman tests for within-construct comparisons
 - Applied Bonferroni correction for multiple testing (155 total tests)
+- **Statistical enhancements:**
+  - Added effect sizes to all demographic comparisons (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis)
+  - Implemented split tryCatch blocks in safe wrappers for graceful degradation when effect size computation fails
+  - Formatted Friedman test outputs using kable() for professional table presentation
+- **Output generation:**
+  - Automated CSV export for all 42 statistical tables (7 tables × 6 constructs)
+  - Generated 6 bar chart visualizations of median ranks with reversed ordering (highest priority on top)
+  - All outputs saved to appropriate directories with consistent naming conventions
 
 ### Technical Infrastructure
 - Rebuilt renv environment from 200+ broken packages to 11 clean core packages
@@ -34,9 +42,15 @@
 **Interpretation:** Pilots demonstrate remarkably consistent preferences for specific retention factors within each construct, regardless of age, gender, position, military background, or years of experience.
 
 ### Output Files
-- `output/reports/subfactor_analysis.html` - Interactive HTML report with all results
-- `output/reports/subfactor_analysis.docx` - Word document for collaboration
-- Both include descriptive statistics, test results, and conclusion
+- **Reports:**
+  - `output/reports/subfactor_analysis.html` - Interactive HTML report with formatted tables and visualizations
+  - `output/reports/subfactor_analysis.docx` - Word document for collaboration
+  - Both include descriptive statistics, Friedman tests, demographic comparisons with effect sizes, and conclusion
+- **CSV Tables (42 files):** `output/tables/subfactor_analysis/`
+  - 7 tables per construct (descriptive, Friedman, age, gender, position, military, experience)
+  - All demographic tables include effect sizes and magnitude interpretations
+- **Figures (6 files):** `output/figures/`
+  - Bar charts of median ranks for each construct (highest priority displayed on top)
 
 ### Documentation
 - Updated README.md with Phase 1A completion

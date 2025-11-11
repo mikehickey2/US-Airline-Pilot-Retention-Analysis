@@ -73,15 +73,35 @@ quarto render scripts/analysis/subfactor_analysis.qmd
 ## Expected Output
 
 ### Reports
-- `output/reports/subfactor_analysis.html` - Interactive HTML report with tables
+- `output/reports/subfactor_analysis.html` - Interactive HTML report with formatted tables and visualizations
 - `output/reports/subfactor_analysis.docx` - Word document for sharing/editing
 
 Both reports include:
 - Demographic summary tables
 - Descriptive statistics for all 31 subfactors
-- Friedman test results for within-construct comparisons
+- Friedman test results (formatted tables) for within-construct comparisons
 - Mann-Whitney U and Kruskal-Wallis test results with Bonferroni corrections
+- **Effect sizes** (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis)
+- Bar chart visualizations showing median ranks (highest priority on top)
 - Conclusion summarizing key findings
+
+### CSV Tables (42 files)
+Automatically generated to `output/tables/subfactor_analysis/`:
+
+**For each construct (Financial, QoL, Professional, Recognition, Schedule, Operational):**
+- `[construct]_descriptive.csv` - Median ranks, means, SDs, % ranked #1
+- `[construct]_friedman.csv` - Within-construct Friedman test results
+- `[construct]_age.csv` - Mann-Whitney tests by age group (≤35 vs >35)
+- `[construct]_gender.csv` - Mann-Whitney tests by gender
+- `[construct]_position.csv` - Mann-Whitney tests by position (Captain vs FO)
+- `[construct]_military.csv` - Mann-Whitney tests by military background
+- `[construct]_experience.csv` - Kruskal-Wallis tests by experience quartiles
+
+**Note:** All demographic tables include effect sizes and magnitude interpretations. Tables may be empty if insufficient group sizes.
+
+### Figures (6 files)
+Automatically generated to `output/figures/`:
+- `[construct]_median_ranks.png` - Bar charts showing median rank for each subfactor (lower rank = higher priority, displayed top to bottom)
 
 ## Expected Runtime
 

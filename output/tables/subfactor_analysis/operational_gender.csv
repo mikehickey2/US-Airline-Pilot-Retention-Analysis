@@ -1,0 +1,6 @@
+item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
+Unambiguous SOPs,255,0.825,1,ns,NA,NA
+Proactive training,240,0.626,1,ns,NA,NA
+Well-maintained aircraft,237,0.586,1,ns,NA,NA
+Well-equipped aircraft,328.5,0.247,1,ns,NA,NA
+Highly skilled pilots,290,0.705,1,ns,NA,NA
