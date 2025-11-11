@@ -58,6 +58,152 @@
 - Created RENV_SETUP.md documenting clean package rebuild
 - Archived old experimental files
 
+### Git History Summary
+- **Commit 5bcab66** (Nov 9): HOTFIX - Fixed critical Friedman test statistical error (persistent respondent IDs)
+- **Commit 49b2888** (Nov 11): Phase 2 - Added effect sizes, CSV/figure outputs, formatting improvements
+- **Commit 08fa1ba** (Nov 11): BUGFIX - Fixed effect size computation bugs (coin package dependency, join keys)
+
+## Phase 2: Validation and Bugfixes - COMPLETED
+
+**Date:** November 11, 2025
+**Status:** ✅ Complete - Effect sizes verified, statistical methods validated
+
+### Critical Bugs Fixed
+
+**Bug 1: Mann-Whitney Effect Sizes All NA**
+- **Root Cause:** `wilcox_effsize()` requires `coin` package which was in renv.lock but not installed (renv::restore() failed due to Matrix compilation issues)
+- **Fix:** Manually installed coin package via `renv::install('coin')` and updated join keys
+- **Location:** `scripts/analysis/subfactor_analysis.qmd:106, 117-118`
+- **Result:** All Mann-Whitney tests now compute rank-biserial r effect sizes correctly
+
+**Bug 2: Kruskal-Wallis Cartesian Join Duplication**
+- **Root Cause:** Join only used `.y.` column (always "rank"), not including grouping column `item`, causing cross-product (6 subfactors × 6 effect sizes = 36 rows)
+- **Fix:** Updated both safe wrappers to include `item` in select and join operations
+- **Location:** `scripts/analysis/subfactor_analysis.qmd:179, 190-191`
+- **Result:** Kruskal-Wallis tests now show one row per subfactor with correct eta-squared values
+
+### Validation Results
+
+**Statistical Appropriateness Confirmed:**
+- Non-parametric tests appropriate for ordinal rankings with small n=76
+- Mann-Whitney U for binary comparisons, Kruskal-Wallis for quartiles - correct choices
+- Bonferroni correction consistently applied across 155 tests
+- Zero significant findings with all "small" effect sizes align with documented conclusions
+
+**Output Verification:**
+- ✅ All 42 CSV tables contain proper effect sizes (no NA, no duplication)
+- ✅ All 6 PNG figures generated with correct ordering (highest priority on top)
+- ✅ HTML and DOCX reports render with formatted tables and visualizations
+- ✅ Spot-checked: `financial_age.csv`, `financial_gender.csv`, `qol_gender.csv`, `financial_experience.csv`
+
+**Known Data Characteristics:**
+- Sample size: n=76 valid responses
+- Demographic imbalances:
+  - Gender: 8 females vs 67 males (extremely imbalanced)
+  - Age: 18 (≤35) vs 58 (>35) (moderately imbalanced)
+  - Experience quartiles: as low as 14 per group
+- Effect sizes: all "small" magnitude (appropriate for exploratory analysis)
+
+### Critical Dependency Warning
+
+⚠️ **IMPORTANT:** The `coin` package is now required for Mann-Whitney effect size computation. Future users must:
+1. Run `renv::restore()` successfully (or manually install coin via `renv::install('coin')`)
+2. If coin is not installed, wilcox_effsize() will fail silently and all Mann-Whitney effect sizes will revert to NA
+3. This dependency is documented in renv.lock but requires successful package installation
+
+---
+
+## Next Steps: Prioritized Action Plan
+
+**Status:** Planning phase - awaiting user approval before proceeding
+
+### High Priority - Maintainability & Documentation
+
+**0. Research appropriateness of using Bonferroni correction across 155 tests**
+- Validate that Bonferroni correction is required and/or good practicefor this analysis
+- Locate references that support or refute the selection Bonferroni correction for this data structure, sample size, or other factors of this analysis
+- If necessary, adjust analysis and .qmd  to meet findings of this research.
+
+**1. Document coin Package Dependency (30 min)**
+- Add prominent warning in README.md about coin requirement
+- Update SUBFACTOR_README.md troubleshooting section
+- Include instruction: "If effect sizes show NA, run `renv::install('coin')`"
+- Document in render script comments
+
+**2. Add Low-Power Warnings for Small Sample Sizes (45 min)**
+- Add code comments flagging comparisons with extreme imbalance
+- Document in report narrative:
+  - Gender: 8 females vs 67 males (Cohen's guidelines suggest n≥15 per group)
+  - Age: 18 vs 58 split
+- Add caveat text in HTML/DOCX conclusion sections
+- Consider adding sample size columns to CSV outputs
+
+**3. Refactor: Create Parameterized Helper Function (2-3 hours)**
+- **Problem:** ~600 lines of near-identical code duplicated across 6 constructs
+- **Solution:** Single reusable function taking:
+  - Variable prefix (financial_, qol_, professional_, etc.)
+  - Label vector
+  - Number of items per construct
+  - Runs all descriptive stats, Friedman tests, demographic comparisons
+  - Generates all CSV/PNG outputs
+- **Benefits:**
+  - Easier maintenance (fix once, applies to all constructs)
+  - Consistent logic across all constructs
+  - Reduced risk of copy-paste errors
+  - Cleaner codebase (~200 lines vs ~800 lines)
+
+### Medium Priority - Robustness
+
+**4. Add Output Verification to Render Script (30 min)**
+- After `quarto_render()`, verify expected files exist:
+  - Check for 42 CSV files in `output/tables/subfactor_analysis/`
+  - Check for 6 PNG files in `output/figures/`
+  - Verify HTML and DOCX reports exist
+- Print summary: "Generated X/42 CSV tables, X/6 figures"
+- Return error if any files missing
+
+**5. Add Error Handling to Render Script (20 min)**
+- Wrap `quarto_render()` in tryCatch
+- Catch and report failures clearly instead of silent exit
+- Log error messages to help debugging
+- Return non-zero exit code on failure
+
+**6. Strengthen Safe Wrappers with Minimum Group Size Thresholds (1 hour)**
+- **Problem:** Current wrappers only check ≥2 groups, but tests run with n=1 per group (unstable)
+- **Solution:** Add minimum count threshold (e.g., n≥5 per group)
+- Skip tests when threshold not met
+- Report why tests were skipped in output
+- Add "skipped_reason" column to CSV tables
+
+### Lower Priority - Polish
+
+**7. Clean Up Console Output in Rendered Reports (1 hour)**
+- Replace verbose `cat()` statements with:
+  - Conditional logging (only in interactive mode)
+  - Quarto callouts for reader-friendly structure
+  - Remove "--- Test ---" separators from rendered output
+- Keep console output helpful for developers, cleaner for readers
+
+**8. Add Narrative Low-Power Notes in Report (30 min)**
+- Add prose section in report explaining:
+  - Sample size limitations (n=76)
+  - Demographic imbalances and interpretation caveats
+  - Why "no significant differences" is still meaningful finding
+  - Effect sizes provide practical importance context
+
+### Estimated Total Time
+- High Priority (1-3): 3.5-4.5 hours
+- Medium Priority (4-6): 2 hours
+- Lower Priority (7-8): 1.5 hours
+- **Total:** 7-8 hours of development work
+
+### Outstanding Structural Issues
+From validation report that remain for future consideration:
+- Consider persisting figure references in render script metadata
+- Potential future enhancement: interactive visualizations
+- Consider adding power analysis section to report
+- Explore effect size confidence intervals if sample size permits
+
 ---
 
 # Original Analysis Plan

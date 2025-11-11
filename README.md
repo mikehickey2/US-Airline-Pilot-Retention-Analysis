@@ -55,9 +55,40 @@ The `.qmd` files now serve as the primary analysis documents, while `.Rmd` files
 
 **R Version:** 4.5.1 or higher
 
-**Required R Packages:** - tidyverse (dplyr, ggplot2, tidyr, readr, stringr) - rstatix (Friedman, Mann-Whitney, Kruskal-Wallis tests) - DescTools (skewness, kurtosis) - janitor (data cleaning) - here (path management) - knitr (reporting) - FSA, PMCMRplus (post-hoc tests) - gmodels, usethis
+**Required R Packages:**
+- tidyverse (dplyr, ggplot2, tidyr, readr, stringr)
+- rstatix (Friedman, Mann-Whitney, Kruskal-Wallis tests)
+- **coin** (required for Mann-Whitney effect sizes - see Critical Dependencies below)
+- DescTools (skewness, kurtosis)
+- janitor (data cleaning)
+- here (path management)
+- knitr (reporting)
+- FSA, PMCMRplus (post-hoc tests)
+- gmodels, usethis
 
-**Quarto Extensions:** - [apaquarto](https://wjschne.github.io/apaquarto/) - APA-formatted manuscripts (7th edition)
+**Quarto Extensions:**
+- [apaquarto](https://wjschne.github.io/apaquarto/) - APA-formatted manuscripts (7th edition)
+
+### Critical Dependencies
+
+⚠️ **IMPORTANT: coin Package Required for Effect Sizes**
+
+The `coin` package is **required** for computing Mann-Whitney U effect sizes (rank-biserial r) in the subfactor analysis. Without it, all Mann-Whitney effect sizes will silently fail and show as `NA` in outputs.
+
+**Setup:**
+```r
+# Install all packages from renv.lock (includes coin)
+renv::restore()
+
+# If renv::restore() fails, manually install coin:
+renv::install("coin")
+```
+
+**Verification:**
+After running the subfactor analysis, check that effect sizes are populated:
+- Open `output/tables/subfactor_analysis/financial_age.csv`
+- Verify the `effsize` column shows numeric values (not `NA`)
+- If all values are `NA`, run `renv::install("coin")` and re-render
 
 ## Quick Start
 

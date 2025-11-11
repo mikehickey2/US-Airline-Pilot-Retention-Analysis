@@ -117,11 +117,14 @@ The analysis revealed **no significant demographic differences** (p.adj < 0.05) 
 Core packages used:
 - `tidyverse` - Data manipulation and visualization
 - `rstatix` - Statistical tests (wilcox_test, kruskal_test, friedman_test)
+- **`coin`** - Required for Mann-Whitney effect size computation (rank-biserial r)
 - `knitr` - Report generation
 - `janitor` - Data cleaning
 - `DescTools` - Descriptive statistics
 
 All packages are managed via `renv` for reproducibility. Run `renv::restore()` to install all required packages.
+
+⚠️ **Critical:** The `coin` package is essential for effect size computation. Without it, all Mann-Whitney effect sizes will be `NA`.
 
 ## Notes
 
@@ -134,18 +137,39 @@ All packages are managed via `renv` for reproducibility. Run `renv::restore()` t
 
 If you encounter errors:
 
-1. Ensure renv is activated and in sync:
+1. **Effect sizes showing as NA**: This is the most common issue, caused by missing `coin` package.
+   ```r
+   # Install coin package
+   renv::install("coin")
+
+   # Verify installation
+   library(coin)
+
+   # Re-render analysis
+   source("render_subfactor_analysis.R")
+
+   # Check outputs
+   read.csv("output/tables/subfactor_analysis/financial_age.csv")
+   # effsize column should show numeric values, not NA
+   ```
+
+2. Ensure renv is activated and in sync:
    ```r
    renv::status()
    renv::restore()
    ```
 
-2. Check that Quarto is installed:
+   **Note:** If `renv::restore()` fails (e.g., Matrix compilation errors), manually install coin:
+   ```r
+   renv::install("coin")
+   ```
+
+3. Check that Quarto is installed:
    ```bash
    quarto --version
    ```
 
-3. Verify you're in the project root directory when running the render script
+4. Verify you're in the project root directory when running the render script
 
 ## Questions?
 

@@ -1,5 +1,15 @@
 # Render Subfactor Analysis to output/reports directory
-# Note: The .qmd file will auto-install any missing packages when it runs
+#
+# CRITICAL DEPENDENCY: The 'coin' package is required for Mann-Whitney effect sizes.
+# Without it, all Mann-Whitney effect sizes will be NA in output tables.
+#
+# Setup:
+#   renv::restore()           # Install all packages including coin
+#   renv::install("coin")     # Or manually install if renv::restore() fails
+#
+# Verification after rendering:
+#   Check output/tables/subfactor_analysis/financial_age.csv
+#   Verify 'effsize' column shows numeric values (not NA)
 
 cat("=== Rendering Subfactor Analysis ===\n\n")
 
