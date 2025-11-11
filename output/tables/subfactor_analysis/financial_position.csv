@@ -1,7 +1,7 @@
 item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
-Competitive salary,603.5,0.574,1,ns,NA,NA
-Allowances and soft pay,596,0.547,1,ns,NA,NA
-Benefits package,646.5,0.973,1,ns,NA,NA
-Disability insurance,730,0.362,1,ns,NA,NA
-Job security,674.5,0.781,1,ns,NA,NA
-New hire/longevity bonuses,755.5,0.137,0.8220000000000001,ns,NA,NA
+Competitive salary,603.5,0.574,1,ns,0.06512362332033583,small
+Allowances and soft pay,596,0.547,1,ns,0.0697867042929845,small
+Benefits package,646.5,0.973,1,ns,0.004547500319755793,small
+Disability insurance,730,0.362,1,ns,0.10532730502927429,small
+Job security,674.5,0.781,1,ns,0.032621173728283485,small
+New hire/longevity bonuses,755.5,0.137,0.8220000000000001,ns,0.17149235417144637,small

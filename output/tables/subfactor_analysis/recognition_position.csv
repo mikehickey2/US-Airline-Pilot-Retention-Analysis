@@ -1,5 +1,5 @@
 item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
-Professional uniforms,767.5,0.171,0.684,ns,NA,NA
-Vacation for long service,496.5,0.078,0.312,ns,NA,NA
-Professional respect/recognition,724,0.385,1,ns,NA,NA
-Airline recognition,618,0.694,1,ns,NA,NA
+Professional uniforms,767.5,0.171,0.684,ns,0.15780481489120943,small
+Vacation for long service,496.5,0.078,0.312,ns,0.20282632154257002,small
+Professional respect/recognition,724,0.385,1,ns,0.10036410461139296,small
+Airline recognition,618,0.694,1,ns,0.04592083166938132,small

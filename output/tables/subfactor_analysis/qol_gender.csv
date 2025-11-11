@@ -1,7 +1,7 @@
 item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
-Predictable schedule,197.5,0.212,1,ns,NA,NA
-Vacation time,253.5,0.803,1,ns,NA,NA
-Family-friendly policies,265.5,0.972,1,ns,NA,NA
-Home base possibility,259,0.88,1,ns,NA,NA
-Travel benefits,359.5,0.102,0.612,ns,NA,NA
-Work-life balance,290.5,0.693,1,ns,NA,NA
+Predictable schedule,197.5,0.212,1,ns,0.1452470274733092,small
+Vacation time,253.5,0.803,1,ns,0.029850796381818943,small
+Family-friendly policies,265.5,0.972,1,ns,0.005106327730496736,small
+Home base possibility,259,0.88,1,ns,0.01851373565884511,small
+Travel benefits,359.5,0.102,0.612,ns,0.18981799392407345,small
+Work-life balance,290.5,0.693,1,ns,0.04659022320650047,small

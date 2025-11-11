@@ -1,6 +1,6 @@
 item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
-Fixed schedule,606,0.622,1,ns,NA,NA
-Variable schedule,647,0.977,1,ns,NA,NA
-Flexible work rules,714,0.462,1,ns,NA,NA
-Bid line seniority system,747.5,0.276,1,ns,NA,NA
-Vacation bidding rules,551.5,0.263,1,ns,NA,NA
+Fixed schedule,606,0.622,1,ns,0.05712388002120402,small
+Variable schedule,647,0.977,1,ns,0.0038874913230075663,small
+Flexible work rules,714,0.462,1,ns,0.0851086405163173,small
+Bid line seniority system,747.5,0.276,1,ns,0.12570119096189797,small
+Vacation bidding rules,551.5,0.263,1,ns,0.12907295164621263,small

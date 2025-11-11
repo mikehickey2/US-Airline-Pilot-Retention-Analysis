@@ -7,6 +7,7 @@ Generated from a static review of `scripts/analysis/subfactor_analysis.qmd` and 
 - Reviewed the R render helper for workflow completeness.
 - Attempted to execute `Rscript` to run the analysis, but even a trivial `Rscript -e "cat('hello')"` call timed out twice in this environment, so this validation documents code-level findings only.
 - **Update (commit `5bcab66`, “HOTFIX: Fix critical Friedman test statistical error”)**: Verified that each construct now creates a persistent `respondent_id` prior to reshaping, so all six Friedman tests reference a valid within-subject identifier. Also confirmed—via direct inspection of `data/processed/retention.csv`—that `slice(-(1:2))` correctly trims the Qualtrics metadata rows without removing real responses (113 rows remain after the slice, 76 after the existing consent/finished filters).
+- **Update (commit `49b2888`, “Phase 2: Add effect sizes, CSV/figure outputs, and formatting improvements”)**: New effect-size plumbing still needs work. Mann-Whitney tables in both HTML and CSV outputs show `effsize`/`magnitude` as `NA` for every construct, so the advertised rank-biserial metrics are not actually delivered. Kruskal-Wallis effect sizes appear, but the join drops the `item` key, producing cross-product duplication (e.g., `output/tables/subfactor_analysis/financial_experience.csv` lists each subfactor six times). Documentation claims all comparisons now include effect sizes, which is factually incorrect until those bugs are fixed.
 
 ## Key Findings
 

@@ -103,7 +103,7 @@ safe_wilcox_test <- function(data, formula, exact = FALSE) {
   error = function(e) {
     # Return NA effect sizes for items that fail
     test_result %>%
-      select(.y.) %>%
+      select(item, .y.) %>%
       distinct() %>%
       mutate(
         effsize = NA_real_,
@@ -111,11 +111,11 @@ safe_wilcox_test <- function(data, formula, exact = FALSE) {
       )
   })
 
-  # Combine results with proper join
+  # Combine results with proper join (include item to avoid cross-product)
   test_result %>%
     left_join(
-      effsize_result %>% select(.y., effsize, magnitude),
-      by = ".y."
+      effsize_result %>% select(item, .y., effsize, magnitude),
+      by = c("item", ".y.")
     )
 }
 
@@ -176,7 +176,7 @@ safe_kruskal_test <- function(data, formula) {
   error = function(e) {
     # Return NA effect sizes for items that fail
     test_result %>%
-      select(.y.) %>%
+      select(item, .y.) %>%
       distinct() %>%
       mutate(
         effsize = NA_real_,
@@ -184,11 +184,11 @@ safe_kruskal_test <- function(data, formula) {
       )
   })
 
-  # Combine results with proper join
+  # Combine results with proper join (include item to avoid cross-product)
   test_result %>%
     left_join(
-      effsize_result %>% select(.y., effsize, magnitude),
-      by = ".y."
+      effsize_result %>% select(item, .y., effsize, magnitude),
+      by = c("item", ".y.")
     )
 }
 
