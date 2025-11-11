@@ -248,6 +248,7 @@ cat("========================================\n\n")
 financial_long <- included_data %>%
   select(age_group, gender_clean, position, exp_q, military_clean,
          financial_1:financial_6) %>%
+  mutate(respondent_id = row_number()) %>%  # Create persistent ID before pivoting
   mutate(across(financial_1:financial_6, as.numeric)) %>%
   pivot_longer(
     cols = financial_1:financial_6,
@@ -272,10 +273,7 @@ kable(financial_desc, digits = 2, caption = "Financial Subfactors - Descriptive 
 
 # Friedman test
 friedman_financial <- financial_long %>%
-  group_by(item) %>%
-  mutate(id = row_number()) %>%
-  ungroup() %>%
-  friedman_test(rank ~ item | id)
+  friedman_test(rank ~ item | respondent_id)
 
 cat("\n--- Friedman Test ---\n")
 print(friedman_financial)
@@ -377,6 +375,7 @@ cat("========================================\n\n")
 qol_long <- included_data %>%
   select(age_group, gender_clean, position, exp_q, military_clean,
          qo_l_1:qo_l_6) %>%
+  mutate(respondent_id = row_number()) %>%  # Create persistent ID before pivoting
   mutate(across(qo_l_1:qo_l_6, as.numeric)) %>%
   pivot_longer(
     cols = qo_l_1:qo_l_6,
@@ -401,10 +400,7 @@ kable(qol_desc, digits = 2, caption = "QoL Subfactors - Descriptive Statistics")
 
 # Friedman test
 friedman_qol <- qol_long %>%
-  group_by(item) %>%
-  mutate(id = row_number()) %>%
-  ungroup() %>%
-  friedman_test(rank ~ item | id)
+  friedman_test(rank ~ item | respondent_id)
 
 cat("\n--- Friedman Test ---\n")
 print(friedman_qol)
@@ -505,6 +501,7 @@ cat("========================================\n\n")
 professional_long <- included_data %>%
   select(age_group, gender_clean, position, exp_q, military_clean,
          professional_1:professional_5) %>%
+  mutate(respondent_id = row_number()) %>%  # Create persistent ID before pivoting
   mutate(across(professional_1:professional_5, as.numeric)) %>%
   pivot_longer(
     cols = professional_1:professional_5,
@@ -523,10 +520,7 @@ kable(professional_desc, digits = 2, caption = "Professional Subfactors - Descri
 
 # Friedman
 friedman_prof <- professional_long %>%
-  group_by(item) %>%
-  mutate(id = row_number()) %>%
-  ungroup() %>%
-  friedman_test(rank ~ item | id)
+  friedman_test(rank ~ item | respondent_id)
 cat("\n--- Friedman Test ---\n"); print(friedman_prof)
 
 # Demographics
@@ -621,6 +615,7 @@ cat("========================================\n\n")
 recognition_long <- included_data %>%
   select(age_group, gender_clean, position, exp_q, military_clean,
          recognition_1, recognition_3, recognition_4, recognition_7) %>%
+  mutate(respondent_id = row_number()) %>%  # Create persistent ID before pivoting
   mutate(across(starts_with("recognition"), as.numeric)) %>%
   pivot_longer(
     cols = starts_with("recognition"),
@@ -639,10 +634,7 @@ kable(recognition_desc, digits = 2, caption = "Recognition Subfactors - Descript
 
 # Friedman
 friedman_recog <- recognition_long %>%
-  group_by(item) %>%
-  mutate(id = row_number()) %>%
-  ungroup() %>%
-  friedman_test(rank ~ item | id)
+  friedman_test(rank ~ item | respondent_id)
 cat("\n--- Friedman Test ---\n"); print(friedman_recog)
 
 # Demographics
@@ -737,6 +729,7 @@ cat("========================================\n\n")
 schedule_long <- included_data %>%
   select(age_group, gender_clean, position, exp_q, military_clean,
          schedule_1:schedule_5) %>%
+  mutate(respondent_id = row_number()) %>%  # Create persistent ID before pivoting
   mutate(across(schedule_1:schedule_5, as.numeric)) %>%
   pivot_longer(
     cols = schedule_1:schedule_5,
@@ -755,10 +748,7 @@ kable(schedule_desc, digits = 2, caption = "Schedule Subfactors - Descriptive St
 
 # Friedman
 friedman_sched <- schedule_long %>%
-  group_by(item) %>%
-  mutate(id = row_number()) %>%
-  ungroup() %>%
-  friedman_test(rank ~ item | id)
+  friedman_test(rank ~ item | respondent_id)
 cat("\n--- Friedman Test ---\n"); print(friedman_sched)
 
 # Demographics
@@ -853,6 +843,7 @@ cat("========================================\n\n")
 operational_long <- included_data %>%
   select(age_group, gender_clean, position, exp_q, military_clean,
          operational_1:operational_5) %>%
+  mutate(respondent_id = row_number()) %>%  # Create persistent ID before pivoting
   mutate(across(operational_1:operational_5, as.numeric)) %>%
   pivot_longer(
     cols = operational_1:operational_5,
@@ -871,10 +862,7 @@ kable(operational_desc, digits = 2, caption = "Operational Subfactors - Descript
 
 # Friedman
 friedman_oper <- operational_long %>%
-  group_by(item) %>%
-  mutate(id = row_number()) %>%
-  ungroup() %>%
-  friedman_test(rank ~ item | id)
+  friedman_test(rank ~ item | respondent_id)
 cat("\n--- Friedman Test ---\n"); print(friedman_oper)
 
 # Demographics
@@ -963,7 +951,9 @@ kable(kw_exp_oper, digits = 3, caption = "Operational: Experience Comparisons")
 
 This analysis examined 31 subfactor rankings across six retention constructs (Financial, Quality of Life, Professional Opportunity, Recognition, Schedule, and Operational) and compared them across five demographic groups: age (≤35 vs >35), gender, position (Captain vs First Officer), military experience, and years of experience (quartiles).
 
-**Key Finding:** After conducting 155 statistical tests with Bonferroni correction for multiple comparisons, **no significant demographic differences were detected** (p.adj < 0.05) in how pilots ranked subfactor priorities within any retention construct.
+**Statistical Methods:** Mann-Whitney U tests were used for binary demographic comparisons, Kruskal-Wallis tests for experience quartiles, and Friedman tests for within-construct comparisons. All tests used proper respondent identifiers to maintain the repeated-measures structure of the data.
+
+**Key Finding:** After conducting 155 demographic comparison tests with Bonferroni correction for multiple comparisons, **no significant demographic differences were detected** (p.adj < 0.05) in how pilots ranked subfactor priorities within any retention construct.
 
 Regardless of age, gender, position, military background, or years of experience, pilots demonstrate similar preferences for specific retention factors within each construct.
 
