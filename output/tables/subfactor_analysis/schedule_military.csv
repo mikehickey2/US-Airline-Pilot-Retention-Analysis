@@ -1,4 +1,4 @@
-item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
+item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
 Fixed schedule,177,0.235,1,ns,0.13737978970747097,small
 Variable schedule,286.5,0.41,1,ns,0.0956662614606732,small
 Flexible work rules,227.5,0.797,1,ns,0.030543572028949615,small

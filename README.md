@@ -6,9 +6,17 @@ Statistical analysis of factors influencing pilot retention at U.S. airlines, fo
 
 ## Recent Updates
 
-**Phase 1A: Subfactor Analysis Complete (November 2025):** Comprehensive analysis of 31 subfactor rankings across all six retention constructs completed with the following findings: - Analyzed all subfactors (Financial, QoL, Professional, Recognition, Schedule, Operational) - Compared rankings across 5 demographic groups (age, gender, position, military experience, experience quartiles) - Applied non-parametric tests with Bonferroni corrections (155 total tests) - **Effect sizes** included for all comparisons (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis) - **Key finding:** No significant demographic differences detected in subfactor priorities (p.adj \< 0.05) - All outputs use readable labels from survey instrument - **Outputs:** 42 CSV tables + 6 median rank visualizations automatically generated - New analysis file: `scripts/analysis/subfactor_analysis.qmd`
+**Type I Error Correction Update (November 2025):** Both analyses updated to use appropriate multiple testing corrections for exploratory pilot research:
+- **Subfactor Analysis:** Implemented hierarchical FDR with two-step procedure (Benjamini-Hochberg screening at construct level q=0.10, then Holm within significant constructs α=0.05)
+- **Retention Analysis:** Applied Benjamini-Hochberg FDR at q=0.10 for all demographic comparisons (30 tests), replacing overly conservative Bonferroni correction
+- Friedman post-hoc tests use Holm's procedure (appropriate for dependent within-subjects comparisons)
+- Gender comparisons use exact tests due to small sample (n=8), requiring coin package
+- All statistical tables now report both raw and adjusted p-values
+- Comprehensive statistical methods sections added to both analyses with rationale and references
 
-**Transition to Positron IDE & Quarto:** The project has migrated from RStudio/.Rmd to Positron/.qmd workflow. Recent experimental work focused on: - Converting article manuscript to Quarto format with APA7 styling (apaquarto) - Refining table formatting and professional column labels - Adding complete manuscript sections (Abstract, Introduction, Method, Results) - Creating automated render script for consistent output generation
+**Phase 1A: Subfactor Analysis Complete (November 2025):** Comprehensive analysis of 31 subfactor rankings across all six retention constructs completed with the following findings: - Analyzed all subfactors (Financial, QoL, Professional, Recognition, Schedule, Operational) - Compared rankings across 5 demographic groups (age, gender, position, military experience, experience quartiles) - Applied **hierarchical false discovery rate (FDR) control**: two-step procedure with Benjamini-Hochberg screening at construct level (q=0.10), then Holm's procedure within significant constructs (α=0.05) - **Effect sizes** included for all comparisons (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis) - All CSV tables include both raw p-values and FDR-adjusted p-values - All outputs use readable labels from survey instrument - **Outputs:** 42 CSV tables + 6 median rank visualizations automatically generated - New analysis file: `scripts/analysis/subfactor_analysis.qmd`
+
+**Transition to Positron IDE & Quarto:** The project has migrated from RStudio/.Rmd to Positron/.qmd workflow. Recent experimental work focused on: - Converting article manuscript to Quarto format with APA7 styling (apaquarto) - Refining table formatting and professional column labels - Adding complete manuscript sections (Abstract, Introduction, Method, Results) - Creating automated render scripts for consistent output generation
 
 The `.qmd` files now serve as the primary analysis documents, while `.Rmd` files are archived.
 

@@ -87,14 +87,27 @@
 **Statistical Appropriateness Confirmed:**
 - Non-parametric tests appropriate for ordinal rankings with small n=76
 - Mann-Whitney U for binary comparisons, Kruskal-Wallis for quartiles - correct choices
-- Bonferroni correction consistently applied across 155 tests
-- Zero significant findings with all "small" effect sizes align with documented conclusions
+- Hierarchical FDR control now applied across all 155 demographic tests (BH construct screening at q=0.10, Holm within selected constructs at α=0.05) to balance Type I/II error in exploratory research
+- Zero statistically significant findings even under the more powerful FDR approach, and all effect sizes remain "small"
 
 **Output Verification:**
 - ✅ All 42 CSV tables contain proper effect sizes (no NA, no duplication)
 - ✅ All 6 PNG figures generated with correct ordering (highest priority on top)
 - ✅ HTML and DOCX reports render with formatted tables and visualizations
 - ✅ Spot-checked: `financial_age.csv`, `financial_gender.csv`, `qol_gender.csv`, `financial_experience.csv`
+
+### Phase 2b: Type I Error Rework – COMPLETED (Nov 11, 2025)
+
+**Objective:** Replace the overly conservative Bonferroni scheme with a hierarchical false discovery rate (FDR) procedure suitable for exploratory pilot work.
+
+**Implementation:**
+- Added construct-level screening immediately after the demographics block. For each construct, we compute the minimum p-value across the five demographic families (age, gender, position, military, experience) and apply Benjamini–Hochberg FDR at q = 0.10 to those six screening p-values.
+- For any construct passing the screen, all child demographic tests retain Holm adjustments at α = 0.05 (i.e., FWER control within the construct). All demographic CSVs now include both raw p-values and Holm-adjusted p-values so downstream reviewers can apply alternative thresholds if desired.
+- Updated statistical-methods sections, README, and SUBFACTOR_README to document the hierarchical approach, its rationale, and references.
+
+**Screening Outcome (latest run, Nov 11):**
+- Only the **Quality of Life** construct cleared the BH screen (min p = 0.0147, p_adj = 0.0588). All other constructs showed no evidence of demographic differences at q = 0.10.
+- Within Quality of Life, Holm-adjusted comparisons all exceeded 0.05 and effect sizes remained small, so no follow-up “discoveries” were declared. All tables flag the exploratory nature of comparisons for constructs that did not pass screening.
 
 **Known Data Characteristics:**
 - Sample size: n=76 valid responses

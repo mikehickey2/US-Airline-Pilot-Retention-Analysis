@@ -40,9 +40,11 @@ For each sub-item, tests if rankings differ by:
 
 ### 4. Multiple Testing Correction
 
-- Applies **Bonferroni correction** to all demographic comparisons
-- Total tests: 155 demographic comparisons across all constructs
-- Significance threshold: p.adj < 0.05
+- Applies **hierarchical false discovery rate (FDR) control** using a two-step procedure tailored for exploratory pilot research:
+  - **Step 1 (Screening):** Benjamini-Hochberg FDR at q = 0.10 across the six construct-level minimum p-values to decide which constructs warrant closer inspection.
+  - **Step 2 (Detailed testing):** Holm’s sequentially rejective procedure at α = 0.05 within each construct that survives Step 1, preserving family-wise error rate inside the construct while keeping more power than Bonferroni.
+- Total demographic tests: 155 across the six constructs and five demographic groupings.
+- Every demographic table now reports both raw p-values and Holm-adjusted p-values so reviewers can see the unadjusted evidence and the multiplicity-aware decision metric side by side.
 
 ## How to Run the Analysis
 
@@ -79,10 +81,13 @@ quarto render scripts/analysis/subfactor_analysis.qmd
 Both reports include:
 - Demographic summary tables
 - Descriptive statistics for all 31 subfactors
+- Construct-level screening results (Benjamini-Hochberg FDR at q=0.10)
 - Friedman test results (formatted tables) for within-construct comparisons
-- Mann-Whitney U and Kruskal-Wallis test results with Bonferroni corrections
+- Mann-Whitney U and Kruskal-Wallis test results with hierarchical FDR corrections
 - **Effect sizes** (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis)
+- All tables show both raw and adjusted p-values
 - Bar chart visualizations showing median ranks (highest priority on top)
+- Statistical methods section with comprehensive rationale and references
 - Conclusion summarizing key findings
 
 ### CSV Tables (42 files)
@@ -110,7 +115,7 @@ Automatically generated to `output/figures/`:
 
 ## Key Findings
 
-The analysis revealed **no significant demographic differences** (p.adj < 0.05) in how pilots ranked subfactor priorities within any retention construct after Bonferroni correction. Pilots demonstrate remarkably consistent preferences regardless of age, gender, position, military background, or years of experience.
+Results from the hierarchical FDR screening and detailed demographic comparisons are presented in the analysis reports. In the most recent run (Nov 11 2025), only the Quality of Life construct cleared the BH screen (p_adj ≈ 0.059), and even there the Holm-adjusted demographic comparisons remained non-significant with small effect sizes. Across all constructs, effect sizes were small (|r| < 0.3, η² < 0.06), indicating minimal practical differences in subfactor priorities by demographics.
 
 ## Package Requirements
 
@@ -130,7 +135,8 @@ All packages are managed via `renv` for reproducibility. Run `renv::restore()` t
 
 - **Sample size**: n=76 valid responses (after exclusions based on finished, consent, and screener criteria)
 - **Non-parametric methods**: All tests use distribution-free methods appropriate for ranked data
-- **Multiple testing correction**: Bonferroni correction applied to control Type I error rate
+- **Multiple testing correction**: Hierarchical FDR control balances Type I and Type II error rates for exploratory pilot research
+- **Statistical approach**: Two-step procedure with construct-level screening (BH-FDR q=0.10) followed by within-construct testing (Holm α=0.05)
 - **Readable labels**: All output uses survey instrument labels instead of variable names
 
 ## Troubleshooting

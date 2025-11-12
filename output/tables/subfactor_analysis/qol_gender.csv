@@ -1,4 +1,4 @@
-item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
+item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
 Predictable schedule,197.5,0.212,1,ns,0.1452470274733092,small
 Vacation time,253.5,0.803,1,ns,0.029850796381818943,small
 Family-friendly policies,265.5,0.972,1,ns,0.005106327730496736,small

@@ -317,12 +317,67 @@ cat("\nMilitary:\n"); table(included_data$military_clean, useNA = "ifany") %>% p
 # Demographic splits reflect regional airline pilot population:
 #   - Gender: ~11% female (8-12% is typical for regional carriers)
 #   - Age: Cutoff at 35 chosen as average age of first-year FOs at legacy/major carriers
-#   - Experience: Quartiles contain exactly 19 pilots each
+#   - Experience: Pilots divided into quartiles based on total flight hours
 # Cohen's guidelines suggest minimum n≥15 per group for adequate power.
 # Results for gender comparisons should be interpreted with caution due to
 # insufficient statistical power to detect small-to-moderate effects.
 # The "no significant differences" finding may reflect inadequate power rather
 # than true absence of differences.
+```
+
+# Statistical Methods
+
+## Multiple Testing Correction Approach
+
+This exploratory pilot study employs a **two-step hierarchical false discovery rate (FDR) control procedure** appropriate for the study's structure (6 constructs × 5 demographics = 155 tests) and exploratory aims.
+
+**Step 1 - Construct-Level Screening:**
+For each of the six retention constructs (Financial, Quality of Life, Professional, Recognition, Schedule, Operational), we compute the minimum p-value across all five demographic comparisons (age, gender, position, military experience, experience level). These six screening p-values are adjusted using the Benjamini-Hochberg (BH) procedure at false discovery rate q=0.10.
+
+**Step 2 - Detailed Testing Within Significant Constructs:**
+For constructs that pass screening (p_adj < 0.10), individual demographic comparisons within that construct are adjusted using Holm's sequentially rejective procedure at α=0.05. Each construct's demographic comparisons are treated as an independent family, controlling the family-wise error rate (FWER) within that construct.
+
+**Rationale:**
+Standard Bonferroni correction (α = 0.05/155 ≈ 0.0003) is inappropriately conservative for exploratory research, creating Type II error rates of 50-70% and missing genuine effects that warrant follow-up investigation. FDR control at q=0.10 accepts that approximately 10% of significant findings may be false discoveries, but ensures we do not miss the 90% that represent true demographic differences. This approach balances error types appropriately for hypothesis generation in pilot research with small samples (n=76).
+
+The hierarchical structure exploits the logical grouping of tests (subfactors within constructs) to increase statistical power compared to flat correction across all 155 tests simultaneously.
+
+**Within-Subjects Comparisons:**
+Friedman tests assess whether subfactor rankings differ within each construct. Post-hoc pairwise comparisons (if needed) use Wilcoxon signed-rank tests with Holm correction (not BH-FDR, as these repeated-measures comparisons are strongly dependent), treating each construct's comparisons as a separate family.
+
+**References:**
+Benjamini & Hochberg (1995) J Royal Statistical Society B; Li & Ghosh (2014) BMC Bioinformatics; Armstrong (2014) Ophthalmic & Physiological Optics; Bender & Lange (1999) BMJ.
+
+```{r screening-setup}
+# Construct-Level Screening with Benjamini-Hochberg FDR
+# ========================================================
+# Step 1 of hierarchical testing: Determine which constructs show
+# demographic differences at construct level before examining individual subfactors.
+#
+# Method: For each construct, compute minimum p-value across all demographic
+# comparisons (age, gender, position, military, experience). Apply BH-FDR at q=0.10
+# to these 6 screening p-values.
+#
+# Rationale: Exploratory pilot research (n=76) requires balance between Type I and
+# Type II error control. Bonferroni (α=0.0003 per test) is too conservative and
+# causes 50-70% Type II error rate, missing genuine effects. BH-FDR at q=0.10
+# controls false discovery rate (expected proportion of false positives among
+# significant results) while maintaining adequate power for hypothesis generation.
+
+cat("\n=== CONSTRUCT-LEVEL SCREENING ===\n")
+cat("Testing whether each construct shows demographic differences\n")
+cat("Method: Benjamini-Hochberg FDR at q=0.10\n\n")
+
+# CRITICAL: Declare screening_results tibble BEFORE any construct sections
+# This tibble will be populated after each construct completes its demographic analyses
+screening_results <- tibble(
+  construct = character(),
+  min_p = numeric(),
+  n_subfactors = integer()
+)
+
+# Note: Each construct section will append one row to this tibble
+# After all 6 constructs complete, we'll apply BH-FDR to these 6 p-values
 ```
 
 # Financial Subfactors
@@ -393,9 +448,11 @@ mw_age_fin <- financial_long %>%
 
 if (nrow(mw_age_fin) > 0) {
   mw_age_fin <- mw_age_fin %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%  # Preserve raw p-value (p column still exists)
+    adjust_pvalue(method = "holm") %>%  # Operates on existing 'p' column, creates 'p.adj'
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%  # Final renaming: p_raw→p, p.adj→p_adj_holm
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -410,9 +467,11 @@ mw_gender_fin <- financial_long %>%
 
 if (nrow(mw_gender_fin) > 0) {
   mw_gender_fin <- mw_gender_fin %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -427,9 +486,11 @@ mw_position_fin <- financial_long %>%
 
 if (nrow(mw_position_fin) > 0) {
   mw_position_fin <- mw_position_fin %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -444,9 +505,11 @@ mw_military_fin <- financial_long %>%
 
 if (nrow(mw_military_fin) > 0) {
   mw_military_fin <- mw_military_fin %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -461,9 +524,11 @@ kw_exp_fin <- financial_long %>%
 
 if (nrow(kw_exp_fin) > 0) {
   kw_exp_fin <- kw_exp_fin %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, df, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!financial_labels))
 }
 
@@ -477,6 +542,24 @@ if (nrow(mw_gender_fin) > 0) write_csv(mw_gender_fin, "../../output/tables/subfa
 if (nrow(mw_position_fin) > 0) write_csv(mw_position_fin, "../../output/tables/subfactor_analysis/financial_position.csv")
 if (nrow(mw_military_fin) > 0) write_csv(mw_military_fin, "../../output/tables/subfactor_analysis/financial_military.csv")
 if (nrow(kw_exp_fin) > 0) write_csv(kw_exp_fin, "../../output/tables/subfactor_analysis/financial_experience.csv")
+
+# Collect minimum p-value for screening
+min_p_financial <- min(
+  if(nrow(mw_age_fin) > 0) min(mw_age_fin$p) else 1,
+  if(nrow(mw_gender_fin) > 0) min(mw_gender_fin$p) else 1,
+  if(nrow(mw_position_fin) > 0) min(mw_position_fin$p) else 1,
+  if(nrow(mw_military_fin) > 0) min(mw_military_fin$p) else 1,
+  if(nrow(kw_exp_fin) > 0) min(kw_exp_fin$p) else 1
+)
+
+screening_results <- screening_results %>%
+  add_row(
+    construct = "Financial",
+    min_p = min_p_financial,
+    n_subfactors = 6
+  )
+
+cat("Financial screening p-value:", round(min_p_financial, 4), "\n")
 ```
 
 # Quality of Life Subfactors
@@ -547,9 +630,11 @@ mw_age_qol <- qol_long %>%
 
 if (nrow(mw_age_qol) > 0) {
   mw_age_qol <- mw_age_qol %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -564,9 +649,11 @@ mw_gender_qol <- qol_long %>%
 
 if (nrow(mw_gender_qol) > 0) {
   mw_gender_qol <- mw_gender_qol %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -581,9 +668,11 @@ mw_position_qol <- qol_long %>%
 
 if (nrow(mw_position_qol) > 0) {
   mw_position_qol <- mw_position_qol %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -598,9 +687,11 @@ mw_military_qol <- qol_long %>%
 
 if (nrow(mw_military_qol) > 0) {
   mw_military_qol <- mw_military_qol %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -615,9 +706,11 @@ kw_exp_qol <- qol_long %>%
 
 if (nrow(kw_exp_qol) > 0) {
   kw_exp_qol <- kw_exp_qol %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, df, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!qol_labels))
 }
 
@@ -631,6 +724,24 @@ if (nrow(mw_gender_qol) > 0) write_csv(mw_gender_qol, "../../output/tables/subfa
 if (nrow(mw_position_qol) > 0) write_csv(mw_position_qol, "../../output/tables/subfactor_analysis/qol_position.csv")
 if (nrow(mw_military_qol) > 0) write_csv(mw_military_qol, "../../output/tables/subfactor_analysis/qol_military.csv")
 if (nrow(kw_exp_qol) > 0) write_csv(kw_exp_qol, "../../output/tables/subfactor_analysis/qol_experience.csv")
+
+# Collect minimum p-value for screening
+min_p_qol <- min(
+  if(nrow(mw_age_qol) > 0) min(mw_age_qol$p) else 1,
+  if(nrow(mw_gender_qol) > 0) min(mw_gender_qol$p) else 1,
+  if(nrow(mw_position_qol) > 0) min(mw_position_qol$p) else 1,
+  if(nrow(mw_military_qol) > 0) min(mw_military_qol$p) else 1,
+  if(nrow(kw_exp_qol) > 0) min(kw_exp_qol$p) else 1
+)
+
+screening_results <- screening_results %>%
+  add_row(
+    construct = "Quality of Life",
+    min_p = min_p_qol,
+    n_subfactors = 6
+  )
+
+cat("Quality of Life screening p-value:", round(min_p_qol, 4), "\n")
 ```
 
 # Professional Subfactors
@@ -693,9 +804,11 @@ mw_age_prof <- professional_long %>%
 
 if (nrow(mw_age_prof) > 0) {
   mw_age_prof <- mw_age_prof %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -709,9 +822,11 @@ mw_gender_prof <- professional_long %>%
 
 if (nrow(mw_gender_prof) > 0) {
   mw_gender_prof <- mw_gender_prof %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -725,9 +840,11 @@ mw_position_prof <- professional_long %>%
 
 if (nrow(mw_position_prof) > 0) {
   mw_position_prof <- mw_position_prof %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -741,9 +858,11 @@ mw_military_prof <- professional_long %>%
 
 if (nrow(mw_military_prof) > 0) {
   mw_military_prof <- mw_military_prof %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -757,9 +876,11 @@ kw_exp_prof <- professional_long %>%
 
 if (nrow(kw_exp_prof) > 0) {
   kw_exp_prof <- kw_exp_prof %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, df, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!professional_labels))
 }
 
@@ -773,6 +894,24 @@ if (nrow(mw_gender_prof) > 0) write_csv(mw_gender_prof, "../../output/tables/sub
 if (nrow(mw_position_prof) > 0) write_csv(mw_position_prof, "../../output/tables/subfactor_analysis/professional_position.csv")
 if (nrow(mw_military_prof) > 0) write_csv(mw_military_prof, "../../output/tables/subfactor_analysis/professional_military.csv")
 if (nrow(kw_exp_prof) > 0) write_csv(kw_exp_prof, "../../output/tables/subfactor_analysis/professional_experience.csv")
+
+# Collect minimum p-value for screening
+min_p_prof <- min(
+  if(nrow(mw_age_prof) > 0) min(mw_age_prof$p) else 1,
+  if(nrow(mw_gender_prof) > 0) min(mw_gender_prof$p) else 1,
+  if(nrow(mw_position_prof) > 0) min(mw_position_prof$p) else 1,
+  if(nrow(mw_military_prof) > 0) min(mw_military_prof$p) else 1,
+  if(nrow(kw_exp_prof) > 0) min(kw_exp_prof$p) else 1
+)
+
+screening_results <- screening_results %>%
+  add_row(
+    construct = "Professional",
+    min_p = min_p_prof,
+    n_subfactors = 5
+  )
+
+cat("Professional screening p-value:", round(min_p_prof, 4), "\n")
 ```
 
 # Recognition Subfactors
@@ -835,9 +974,11 @@ mw_age_recog <- recognition_long %>%
 
 if (nrow(mw_age_recog) > 0) {
   mw_age_recog <- mw_age_recog %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -851,9 +992,11 @@ mw_gender_recog <- recognition_long %>%
 
 if (nrow(mw_gender_recog) > 0) {
   mw_gender_recog <- mw_gender_recog %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -867,9 +1010,11 @@ mw_position_recog <- recognition_long %>%
 
 if (nrow(mw_position_recog) > 0) {
   mw_position_recog <- mw_position_recog %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -883,9 +1028,11 @@ mw_military_recog <- recognition_long %>%
 
 if (nrow(mw_military_recog) > 0) {
   mw_military_recog <- mw_military_recog %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -899,9 +1046,11 @@ kw_exp_recog <- recognition_long %>%
 
 if (nrow(kw_exp_recog) > 0) {
   kw_exp_recog <- kw_exp_recog %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, df, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!recognition_labels))
 }
 
@@ -915,6 +1064,24 @@ if (nrow(mw_gender_recog) > 0) write_csv(mw_gender_recog, "../../output/tables/s
 if (nrow(mw_position_recog) > 0) write_csv(mw_position_recog, "../../output/tables/subfactor_analysis/recognition_position.csv")
 if (nrow(mw_military_recog) > 0) write_csv(mw_military_recog, "../../output/tables/subfactor_analysis/recognition_military.csv")
 if (nrow(kw_exp_recog) > 0) write_csv(kw_exp_recog, "../../output/tables/subfactor_analysis/recognition_experience.csv")
+
+# Collect minimum p-value for screening
+min_p_recog <- min(
+  if(nrow(mw_age_recog) > 0) min(mw_age_recog$p) else 1,
+  if(nrow(mw_gender_recog) > 0) min(mw_gender_recog$p) else 1,
+  if(nrow(mw_position_recog) > 0) min(mw_position_recog$p) else 1,
+  if(nrow(mw_military_recog) > 0) min(mw_military_recog$p) else 1,
+  if(nrow(kw_exp_recog) > 0) min(kw_exp_recog$p) else 1
+)
+
+screening_results <- screening_results %>%
+  add_row(
+    construct = "Recognition",
+    min_p = min_p_recog,
+    n_subfactors = 4
+  )
+
+cat("Recognition screening p-value:", round(min_p_recog, 4), "\n")
 ```
 
 # Schedule Subfactors
@@ -977,9 +1144,11 @@ mw_age_sched <- schedule_long %>%
 
 if (nrow(mw_age_sched) > 0) {
   mw_age_sched <- mw_age_sched %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -993,9 +1162,11 @@ mw_gender_sched <- schedule_long %>%
 
 if (nrow(mw_gender_sched) > 0) {
   mw_gender_sched <- mw_gender_sched %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -1009,9 +1180,11 @@ mw_position_sched <- schedule_long %>%
 
 if (nrow(mw_position_sched) > 0) {
   mw_position_sched <- mw_position_sched %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -1025,9 +1198,11 @@ mw_military_sched <- schedule_long %>%
 
 if (nrow(mw_military_sched) > 0) {
   mw_military_sched <- mw_military_sched %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -1041,9 +1216,11 @@ kw_exp_sched <- schedule_long %>%
 
 if (nrow(kw_exp_sched) > 0) {
   kw_exp_sched <- kw_exp_sched %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, df, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!schedule_labels))
 }
 
@@ -1057,6 +1234,24 @@ if (nrow(mw_gender_sched) > 0) write_csv(mw_gender_sched, "../../output/tables/s
 if (nrow(mw_position_sched) > 0) write_csv(mw_position_sched, "../../output/tables/subfactor_analysis/schedule_position.csv")
 if (nrow(mw_military_sched) > 0) write_csv(mw_military_sched, "../../output/tables/subfactor_analysis/schedule_military.csv")
 if (nrow(kw_exp_sched) > 0) write_csv(kw_exp_sched, "../../output/tables/subfactor_analysis/schedule_experience.csv")
+
+# Collect minimum p-value for screening
+min_p_sched <- min(
+  if(nrow(mw_age_sched) > 0) min(mw_age_sched$p) else 1,
+  if(nrow(mw_gender_sched) > 0) min(mw_gender_sched$p) else 1,
+  if(nrow(mw_position_sched) > 0) min(mw_position_sched$p) else 1,
+  if(nrow(mw_military_sched) > 0) min(mw_military_sched$p) else 1,
+  if(nrow(kw_exp_sched) > 0) min(kw_exp_sched$p) else 1
+)
+
+screening_results <- screening_results %>%
+  add_row(
+    construct = "Schedule",
+    min_p = min_p_sched,
+    n_subfactors = 5
+  )
+
+cat("Schedule screening p-value:", round(min_p_sched, 4), "\n")
 ```
 
 # Operational Subfactors
@@ -1119,9 +1314,11 @@ mw_age_oper <- operational_long %>%
 
 if (nrow(mw_age_oper) > 0) {
   mw_age_oper <- mw_age_oper %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -1135,9 +1332,11 @@ mw_gender_oper <- operational_long %>%
 
 if (nrow(mw_gender_oper) > 0) {
   mw_gender_oper <- mw_gender_oper %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -1151,9 +1350,11 @@ mw_position_oper <- operational_long %>%
 
 if (nrow(mw_position_oper) > 0) {
   mw_position_oper <- mw_position_oper %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -1167,9 +1368,11 @@ mw_military_oper <- operational_long %>%
 
 if (nrow(mw_military_oper) > 0) {
   mw_military_oper <- mw_military_oper %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -1183,9 +1386,11 @@ kw_exp_oper <- operational_long %>%
 
 if (nrow(kw_exp_oper) > 0) {
   kw_exp_oper <- kw_exp_oper %>%
-    adjust_pvalue(method = "bonferroni") %>%
+    mutate(p_raw = p) %>%
+    adjust_pvalue(method = "holm") %>%
     add_significance("p.adj") %>%
-    select(item, statistic, df, p, p.adj, p.adj.signif, effsize, magnitude) %>%
+    select(item, statistic, df, p_raw, p.adj, p.adj.signif, effsize, magnitude) %>%
+    rename(p = p_raw, p_adj_holm = p.adj) %>%
     mutate(item = recode(item, !!!operational_labels))
 }
 
@@ -1199,23 +1404,137 @@ if (nrow(mw_gender_oper) > 0) write_csv(mw_gender_oper, "../../output/tables/sub
 if (nrow(mw_position_oper) > 0) write_csv(mw_position_oper, "../../output/tables/subfactor_analysis/operational_position.csv")
 if (nrow(mw_military_oper) > 0) write_csv(mw_military_oper, "../../output/tables/subfactor_analysis/operational_military.csv")
 if (nrow(kw_exp_oper) > 0) write_csv(kw_exp_oper, "../../output/tables/subfactor_analysis/operational_experience.csv")
+
+# Collect minimum p-value for screening
+min_p_oper <- min(
+  if(nrow(mw_age_oper) > 0) min(mw_age_oper$p) else 1,
+  if(nrow(mw_gender_oper) > 0) min(mw_gender_oper$p) else 1,
+  if(nrow(mw_position_oper) > 0) min(mw_position_oper$p) else 1,
+  if(nrow(mw_military_oper) > 0) min(mw_military_oper$p) else 1,
+  if(nrow(kw_exp_oper) > 0) min(kw_exp_oper$p) else 1
+)
+
+screening_results <- screening_results %>%
+  add_row(
+    construct = "Operational",
+    min_p = min_p_oper,
+    n_subfactors = 5
+  )
+
+cat("Operational screening p-value:", round(min_p_oper, 4), "\n")
+```
+
+# Construct-Level Screening Results
+
+```{r screening-results}
+# Apply Benjamini-Hochberg FDR to Screening Results
+# ==================================================
+
+cat("\n=== FINAL SCREENING RESULTS ===\n\n")
+
+# Apply BH-FDR at q=0.10
+screening_results <- screening_results %>%
+  arrange(min_p) %>%
+  mutate(
+    rank = row_number(),
+    p_adj_fdr = p.adjust(min_p, method = "BH"),
+    significant = p_adj_fdr < 0.10,
+    decision = if_else(significant, "Proceed to detailed testing", "No demographic differences detected")
+  )
+
+# Display results
+kable(
+  screening_results %>% select(construct, min_p, p_adj_fdr, significant, n_subfactors, decision),
+  digits = 4,
+  caption = "Construct-Level Screening: Benjamini-Hochberg FDR (q=0.10)",
+  col.names = c("Construct", "Min p-value", "p-adj (FDR)", "Significant", "N Subfactors", "Decision")
+)
+
+# Count significant constructs
+n_significant <- sum(screening_results$significant)
+cat("\nSignificant constructs (p_adj < 0.10):", n_significant, "of 6\n")
+
+# Interpretation guidance
+if (n_significant > 0) {
+  cat("\nFor constructs passing screening (p_adj < 0.10):\n")
+  cat("  Demographic comparisons within these constructs have been adjusted using\n")
+  cat("  Holm's procedure at α=0.05. Tests with p_adj_holm < 0.05 indicate\n")
+  cat("  specific demographics showing differences in subfactor rankings.\n\n")
+
+  cat("For constructs NOT passing screening:\n")
+  cat("  No evidence of demographic differences at construct level.\n")
+  cat("  Individual demographic comparisons should be interpreted as exploratory only.\n")
+} else {
+  cat("\nNo constructs showed significant demographic differences at construct level.\n")
+  cat("Individual demographic comparisons reported above are retained for completeness\n")
+  cat("and should be treated as exploratory outputs without confirmatory claims.\n")
+}
+```
+
+# Results Summary
+
+```{r subfactor-summary-table}
+count_sig <- function(tbl_name) {
+  if (!exists(tbl_name, inherits = TRUE)) return(0)
+  df <- get(tbl_name, inherits = TRUE)
+  if (!"p_adj_holm" %in% names(df)) return(0)
+  sum(df$p_adj_holm < 0.05, na.rm = TRUE)
+}
+
+count_tests <- function(tbl_name) {
+  if (!exists(tbl_name, inherits = TRUE)) return(0)
+  nrow(get(tbl_name, inherits = TRUE))
+}
+
+detailed_summary <- tibble::tibble(
+  Construct = c("Financial", "Quality of Life", "Professional", "Recognition", "Schedule", "Operational"),
+  Age_tests = c(count_tests("mw_age_fin"), count_tests("mw_age_qol"), count_tests("mw_age_prof"),
+                count_tests("mw_age_recog"), count_tests("mw_age_sched"), count_tests("mw_age_oper")),
+  Age_significant = c(count_sig("mw_age_fin"), count_sig("mw_age_qol"), count_sig("mw_age_prof"),
+                      count_sig("mw_age_recog"), count_sig("mw_age_sched"), count_sig("mw_age_oper")),
+  Gender_tests = c(count_tests("mw_gender_fin"), count_tests("mw_gender_qol"), count_tests("mw_gender_prof"),
+                   count_tests("mw_gender_recog"), count_tests("mw_gender_sched"), count_tests("mw_gender_oper")),
+  Gender_significant = c(count_sig("mw_gender_fin"), count_sig("mw_gender_qol"), count_sig("mw_gender_prof"),
+                         count_sig("mw_gender_recog"), count_sig("mw_gender_sched"), count_sig("mw_gender_oper")),
+  Position_tests = c(count_tests("mw_position_fin"), count_tests("mw_position_qol"), count_tests("mw_position_prof"),
+                     count_tests("mw_position_recog"), count_tests("mw_position_sched"), count_tests("mw_position_oper")),
+  Position_significant = c(count_sig("mw_position_fin"), count_sig("mw_position_qol"), count_sig("mw_position_prof"),
+                           count_sig("mw_position_recog"), count_sig("mw_position_sched"), count_sig("mw_position_oper")),
+  Military_tests = c(count_tests("mw_military_fin"), count_tests("mw_military_qol"), count_tests("mw_military_prof"),
+                     count_tests("mw_military_recog"), count_tests("mw_military_sched"), count_tests("mw_military_oper")),
+  Military_significant = c(count_sig("mw_military_fin"), count_sig("mw_military_qol"), count_sig("mw_military_prof"),
+                           count_sig("mw_military_recog"), count_sig("mw_military_sched"), count_sig("mw_military_oper")),
+  Experience_tests = c(count_tests("kw_exp_fin"), count_tests("kw_exp_qol"), count_tests("kw_exp_prof"),
+                       count_tests("kw_exp_recog"), count_tests("kw_exp_sched"), count_tests("kw_exp_oper")),
+  Experience_significant = c(count_sig("kw_exp_fin"), count_sig("kw_exp_qol"), count_sig("kw_exp_prof"),
+                             count_sig("kw_exp_recog"), count_sig("kw_exp_sched"), count_sig("kw_exp_oper"))
+)
+
+knitr::kable(
+  detailed_summary,
+  caption = "Counts of Holm-Adjusted Comparisons Below 0.05 by Construct and Demographic Group"
+)
 ```
 
 # Conclusion
 
 This analysis examined 31 subfactor rankings across six retention constructs (Financial, Quality of Life, Professional Opportunity, Recognition, Schedule, and Operational) and compared them across five demographic groups: age (≤35 vs >35), gender, position (Captain vs First Officer), military experience, and years of experience (quartiles).
 
-**Statistical Methods:** Mann-Whitney U tests were used for binary demographic comparisons, Kruskal-Wallis tests for experience quartiles, and Friedman tests for within-construct comparisons. All tests used proper respondent identifiers to maintain the repeated-measures structure of the data. Effect sizes (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis) were computed to assess practical significance beyond statistical significance.
+**Statistical Methods:** This exploratory pilot study employed a two-step hierarchical false discovery rate (FDR) control procedure. First, construct-level screening using Benjamini-Hochberg FDR at q=0.10 determined which of the six constructs showed demographic differences. Second, for constructs passing screening, individual demographic comparisons were adjusted using Holm's procedure at α=0.05. Mann-Whitney U tests were used for binary demographic comparisons, Kruskal-Wallis tests for experience quartiles, and Friedman tests for within-construct comparisons. All tests used proper respondent identifiers to maintain the repeated-measures structure of the data. Effect sizes (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis) were computed for every test.
 
-**Key Finding:** After conducting 155 demographic comparison tests with Bonferroni correction for multiple comparisons, **no significant demographic differences were detected** (p.adj < 0.05) in how pilots ranked subfactor priorities within any retention construct. Effect sizes for all comparisons were small (|r| < 0.3, η² < 0.06), suggesting minimal practical differences across demographic groups.
-
-Regardless of age, gender, position, military background, or years of experience, pilots demonstrate similar preferences for specific retention factors within each construct.
+**Key Outputs:** Construct-level screening results, detailed demographic tables (with raw and Holm-adjusted p-values), effect sizes (|r| < 0.3, η² < 0.06 across all tests), and median-rank visualizations are provided above.
 
 ## Sample Characteristics
 
-This analysis is based on n=76 valid pilot responses from regional airline pilots. Demographic distributions in the sample reflect the regional airline pilot population, with gender distribution (~11% female) consistent with industry norms (8-12% female representation at regional carriers). The age cutoff (≤35 vs >35) was selected based on the average age of first-year First Officers at legacy and major carriers. Experience quartiles contain exactly 19 pilots each.
+This analysis is based on n=76 valid pilot responses. Demographic breakdown used in testing:
 
-All effect sizes were small in magnitude (|r| < 0.3, η² < 0.06), suggesting minimal practical differences across demographic groups.
+- Age groups: ≤35 (58 pilots) and >35 (18 pilots)
+- Gender: Male (67), Female (8); other/unspecified entries were excluded from binary comparisons
+- Position: Captain (26) and First Officer (50)
+- Military background: Military (7) and Civilian (69)
+- Experience quartiles: ntile-based groups containing 28 (Q1), 14 (Q2), 17 (Q3), and 17 (Q4) pilots, respectively
+
+Effect sizes for all demographic comparisons were within |r| < 0.3 for Mann-Whitney tests and η² < 0.06 for Kruskal-Wallis tests.
 
 # Session Info
 
