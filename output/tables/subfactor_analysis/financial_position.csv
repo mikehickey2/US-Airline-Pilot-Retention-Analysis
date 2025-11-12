@@ -1,4 +1,4 @@
-item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
+item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
 Competitive salary,603.5,0.574,1,ns,0.06512362332033583,small
 Allowances and soft pay,596,0.547,1,ns,0.0697867042929845,small
 Benefits package,646.5,0.973,1,ns,0.004547500319755793,small

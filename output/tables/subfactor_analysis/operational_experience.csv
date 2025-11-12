@@ -1,5 +1,5 @@
-item,statistic,df,p,p.adj,p.adj.signif,effsize,magnitude
-Unambiguous SOPs,4.274024319876601,3,0.233,1,ns,0.01769478222050834,small
+item,statistic,df,p,p_adj_holm,p.adj.signif,effsize,magnitude
+Unambiguous SOPs,4.274024319876601,3,0.233,0.932,ns,0.01769478222050834,small
 Proactive training,0.4758871576004136,3,0.924,1,ns,-0.035057122811105366,small
 Well-maintained aircraft,1.9852538322550255,3,0.575,1,ns,-0.014093696774235756,small
 Well-equipped aircraft,0.3264014059120048,3,0.955,1,ns,-0.037133313806777715,small

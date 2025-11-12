@@ -6,6 +6,12 @@ format:
   docx:
     toc: true
     toc-depth: 3
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    embed-resources: true
+    theme: cosmo
 params:
   data_file: "data/processed/retention.csv"
 ---
@@ -86,6 +92,26 @@ cat("**Total records in file:**", total_records,
 ```{r write-clean, echo = TRUE}
 write_csv(included_data, here("data/processed/retention_cleaned.csv"))
 ```
+
+# Statistical Methods
+
+## Multiple Testing Correction
+
+This exploratory analysis of general retention factor rankings (6 factors × 5 demographics = 30 tests) employs **Benjamini-Hochberg false discovery rate (FDR) control** at q=0.10.
+
+**Rationale:**
+For pilot studies with exploratory aims, FDR provides appropriate balance between detecting genuine demographic differences (avoiding Type II errors) and controlling false discoveries. Standard Bonferroni correction (α = 0.05/30 ≈ 0.0017) is overly conservative for hypothesis generation, increasing Type II error rates to 40-60% and causing researchers to miss important effects worthy of follow-up investigation.
+
+FDR at q=0.10 means we accept that approximately 10% of significant findings may be false positives, while ensuring we identify 90% of true demographic differences. This error balance is appropriate when findings prompt further research rather than immediate policy decisions.
+
+**Within-Subjects Testing:**
+Friedman test assesses whether the six retention factors differ in importance. Post-hoc pairwise comparisons use Wilcoxon signed-rank tests with Holm's sequentially rejective procedure. Holm is used rather than BH-FDR because repeated-measures comparisons are strongly dependent (same participants in all comparisons), and BH-FDR could inflate false positive rates under such dependence. Holm maintains family-wise error rate control for dependent tests while being more powerful than Bonferroni.
+
+**Small Sample Adjustments:**
+Gender comparisons use exact Mann-Whitney U tests (rather than asymptotic approximations) due to small female subsample (n=8). Exact tests provide valid inference with samples below n=10 where asymptotic assumptions fail. Exact tests require the coin package for computation.
+
+**References:**
+Benjamini & Hochberg (1995); Bender & Lange (1999); Armstrong (2014).
 
 \#`{r preview-clean, echo = FALSE} #knitr::kable(head(included_data), caption = "Preview of Cleaned Data") #`
 
@@ -476,7 +502,7 @@ pairwise_tbl <- general_long %>%
   pairwise_wilcox_test(
     rank ~ factor,
     paired = TRUE,
-    p.adjust.method = "bonferroni"
+    p.adjust.method = "holm"  # Holm for dependent tests, NOT BH
   ) %>%
   mutate(
     comparison = str_c(group1, " vs ", group2),
@@ -487,7 +513,7 @@ pairwise_tbl <- general_long %>%
   select(comparison, p.sig)
 
 knitr::kable(pairwise_tbl,
-             caption = "Table 3\nPairwise Wilcoxon Tests Between General Factors\n(Bonferroni‑adjusted p‑values)")
+             caption = "Table 3\nPairwise Wilcoxon Tests Between General Factors\n(Holm‑adjusted p‑values)")
 ```
 
 ```{r RQ2a-age-groups}
@@ -529,20 +555,24 @@ age_medians <- general_age_long %>%
 mw_tbl <- general_age_long %>%
   group_by(factor) %>%
   wilcox_test(rank ~ age_group, exact = FALSE) %>%  # asymptotic; >30 per group
-  mutate(p_adj = p.adjust(p, method = "bonferroni")) %>%
-  select(factor, p_adj)
+  mutate(
+    p_raw = p,
+    p_adj_fdr = p.adjust(p, method = "BH"),
+    significant_fdr10 = p_adj_fdr < 0.10
+  ) %>%
+  select(factor, statistic, p_raw, p_adj_fdr, significant_fdr10, n1, n2)
 
 # 5 ── merge medians + p-values ------------------------------------------
 results_tbl <- age_medians %>%
   left_join(mw_tbl, by = "factor") %>%
-  arrange(p_adj)
+  arrange(p_raw)
 
 knitr::kable(results_tbl,
-             digits = 2,
+             digits = 3,
              col.names = c("Factor",
                            "n ≤35", "Median ≤35",
                            "n >35", "Median >35",
-                           "p (Bonferroni)"),
+                           "Statistic", "p (raw)", "p (FDR)", "Sig (q=0.10)", "n1", "n2"),
              caption = "Table 4\nMann‑Whitney U Tests: Age Groups (≤ 35 vs > 35) on General‑Factor Ranks")
 ```
 
@@ -594,12 +624,17 @@ knitr::kable(exp_medians,
 kw_tbl <- general_exp_long %>%
   group_by(factor) %>%
   kruskal_test(rank ~ exp_q) %>%
-  mutate(p_adj = p.adjust(p, method = "bonferroni")) %>%
-  select(factor, statistic, df, p_adj)
+  mutate(
+    p_raw = p,
+    p_adj_fdr = p.adjust(p, method = "BH"),
+    significant_fdr10 = p_adj_fdr < 0.10
+  ) %>%
+  select(factor, statistic, df, p_raw, p_adj_fdr, significant_fdr10)
 
 knitr::kable(kw_tbl,
              digits = 3,
-             caption = "Table 6\nKruskal–Wallis Tests for Experience Quartiles (Bonferroni‑adjusted p)")
+             col.names = c("Factor", "Statistic", "df", "p (raw)", "p (FDR)", "Sig (q=0.10)"),
+             caption = "Table 6\nKruskal–Wallis Tests for Experience Quartiles (FDR‑adjusted p)")
 
 ```
 
@@ -659,13 +694,18 @@ if(all(c("Male", "Female") %in% names(gender_counts)) &&
 
   mw_gender <- general_gender_long %>%
     group_by(factor) %>%
-    wilcox_test(rank ~ gender, exact = FALSE) %>%
-    mutate(p_adj = p.adjust(p, method = "bonferroni")) %>%
-    select(factor, p_adj)
+    wilcox_test(rank ~ gender, exact = TRUE) %>%  # EXACT for n=8
+    mutate(
+      p_raw = p,
+      p_adj_fdr = p.adjust(p, method = "BH"),
+      significant_fdr10 = p_adj_fdr < 0.10
+    ) %>%
+    select(factor, statistic, p_raw, p_adj_fdr, significant_fdr10, n1, n2)
 
   knitr::kable(mw_gender,
                digits = 3,
-               caption = "Table 8\nMann‑Whitney U Tests: Male vs Female (Bonferroni‑adjusted p)")
+               col.names = c("Factor", "Statistic", "p (raw)", "p (FDR)", "Sig (q=0.10)", "n1", "n2"),
+               caption = "Table 8\nMann‑Whitney U Tests: Male vs Female (Exact test; FDR‑adjusted p)")
 } else {
   cat("\nMann‑Whitney tests skipped: fewer than 5 cases in one gender group.\n")
 }
@@ -720,12 +760,17 @@ if(all(mil_counts >= 5)){
   mw_mil <- general_mil_long %>%
     group_by(factor) %>%
     wilcox_test(rank ~ military_bg, exact = FALSE) %>%
-    mutate(p_adj = p.adjust(p, method = "bonferroni")) %>%
-    select(factor, p_adj)
+    mutate(
+      p_raw = p,
+      p_adj_fdr = p.adjust(p, method = "BH"),
+      significant_fdr10 = p_adj_fdr < 0.10
+    ) %>%
+    select(factor, statistic, p_raw, p_adj_fdr, significant_fdr10, n1, n2)
 
   knitr::kable(mw_mil,
                digits = 3,
-               caption = "Table 10\nMann‑Whitney U Tests: Military vs Civilian (Bonferroni‑adjusted p)")
+               col.names = c("Factor", "Statistic", "p (raw)", "p (FDR)", "Sig (q=0.10)", "n1", "n2"),
+               caption = "Table 10\nMann‑Whitney U Tests: Military vs Civilian (FDR‑adjusted p)")
 } else {
   cat("\nMann‑Whitney skipped: fewer than 5 military cases.\n")
 }
@@ -781,43 +826,20 @@ knitr::kable(carrier_medians,
 kw_carrier <- carrier_long %>%
   group_by(factor) %>%
   kruskal_test(rank ~ carrier_grp) %>%
-  mutate(p_adj = p.adjust(p, method = "bonferroni")) %>%
-  select(factor, statistic, df, p_adj)
+  mutate(
+    p_raw = p,
+    p_adj_fdr = p.adjust(p, method = "BH"),
+    significant_fdr10 = p_adj_fdr < 0.10
+  ) %>%
+  select(factor, statistic, df, p_raw, p_adj_fdr, significant_fdr10)
 
 knitr::kable(kw_carrier,
              digits = 3,
-             caption = "Table 12\nKruskal–Wallis Tests Across Carrier Groups (Bonferroni‑adjusted p)")
+             col.names = c("Factor", "Statistic", "df", "p (raw)", "p (FDR)", "Sig (q=0.10)"),
+             caption = "Table 12\nKruskal–Wallis Tests Across Carrier Groups (FDR‑adjusted p)")
 ```
 
 ```{r final-heatmap}
-library(dplyr); library(tidyr); library(ggplot2); library(stringr)
-
-# 1. assemble median tables into a single frame --------------------------
-med_age   <- age_medians   %>% pivot_longer(-factor) %>% mutate(demo = "Age")
-med_exp   <- exp_medians   %>% pivot_longer(-factor) %>% mutate(demo = "Experience")
-med_gend  <- gender_medians%>% pivot_longer(-factor) %>% mutate(demo = "Gender")
-med_mil   <- mil_medians   %>% pivot_longer(-factor) %>% mutate(demo = "Military")
-med_carr  <- carrier_medians %>% pivot_longer(-factor) %>% mutate(demo = "Carrier")
-
-heat_raw <- bind_rows(med_age, med_exp, med_gend, med_mil, med_carr) %>%
-  filter(str_detect(name, "_median$")) %>%                # keep medians only
-  separate(name, into = c("group", "metric"), sep = "_") %>%
-  select(demo, group, factor, value) %>%
-  mutate(group = str_replace_all(group, "\\.", " "))      # nicer labels
-
-# 2. plot ----------------------------------------------------------------
-ggplot(heat_raw, aes(x = factor, y = paste(demo, group, sep = ": "))) +
-  geom_tile(aes(fill = value), colour = "white") +
-  scale_fill_gradient(low = "steelblue", high = "lightgrey",
-                      breaks = 1:6, limits = c(1, 6), name = "Median Rank") +
-  labs(title = "Figure 2. Median Rank of Retention Factors by Demographic Group",
-       x = "Retention Factor", y = "Demographic Sub‑Group") +
-  theme_minimal(base_size = 10) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "right")
-```
-
-```{r final-heatmap-blue-red}
 library(dplyr); library(tidyr); library(ggplot2); library(stringr)
 
 # 1. Gather median tables into one frame (reuse earlier objects) ----------
@@ -857,6 +879,56 @@ ggplot(heat_raw,
   theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "right")
+```
+
+# Results Summary
+
+```{r retention-results-summary}
+library(dplyr)
+
+calc_summary <- function(obj_name, label) {
+  if (!exists(obj_name, inherits = TRUE)) {
+    return(tibble(
+      Demographic = label,
+      Tests = 0,
+      Min_p_raw = NA_real_,
+      Min_p_adj = NA_real_,
+      Significant_q10 = NA_integer_
+    ))
+  }
+
+  df <- get(obj_name, inherits = TRUE)
+  if (!("p_raw" %in% names(df)) && "p" %in% names(df)) {
+    df$p_raw <- df$p
+  }
+  if (!("p_adj_fdr" %in% names(df))) {
+    df$p_adj_fdr <- NA_real_
+  }
+  sig_col <- if ("significant_fdr10" %in% names(df)) df$significant_fdr10 else rep(NA, nrow(df))
+
+  tibble(
+    Demographic = label,
+    Tests = nrow(df),
+    Min_p_raw = if (nrow(df) > 0) min(df$p_raw, na.rm = TRUE) else NA_real_,
+    Min_p_adj = if (nrow(df) > 0) min(df$p_adj_fdr, na.rm = TRUE) else NA_real_,
+    Significant_q10 = if (all(is.na(sig_col))) NA_integer_ else sum(sig_col, na.rm = TRUE)
+  )
+}
+
+results_summary <- bind_rows(
+  calc_summary("mw_tbl", "Age (≤35 vs >35)"),
+  calc_summary("kw_tbl", "Experience Quartiles"),
+  calc_summary("mw_gender", "Gender (Male vs Female)"),
+  calc_summary("mw_mil", "Military Background"),
+  calc_summary("mw_pos", "Flight-Deck Position"),
+  calc_summary("kw_carrier", "Carrier Type")
+)
+
+knitr::kable(
+  results_summary,
+  digits = 4,
+  caption = "Summary of BH-FDR Results Across Demographic Comparisons"
+)
 ```
 
 ```{r RQ2c-position-corrected}
@@ -911,12 +983,17 @@ if(all(pos_counts >= 5)){
   mw_pos <- position_long %>%
     group_by(factor) %>%
     wilcox_test(rank ~ position, exact = FALSE) %>%
-    mutate(p_adj = p.adjust(p, method = "bonferroni")) %>%
-    select(factor, p_adj)
+    mutate(
+      p_raw = p,
+      p_adj_fdr = p.adjust(p, method = "BH"),
+      significant_fdr10 = p_adj_fdr < 0.10
+    ) %>%
+    select(factor, statistic, p_raw, p_adj_fdr, significant_fdr10, n1, n2)
 
   knitr::kable(mw_pos,
                digits = 3,
-               caption = "Table X2\nMann‑Whitney U Tests: Captain vs First Officer (Bonferroni‑adjusted p)")
+               col.names = c("Factor", "Statistic", "p (raw)", "p (FDR)", "Sig (q=0.10)", "n1", "n2"),
+               caption = "Table X2\nMann‑Whitney U Tests: Captain vs First Officer (FDR‑adjusted p)")
 } else {
   cat("\nMann‑Whitney skipped: fewer than 5 cases in one position group.\n")
 }
@@ -960,39 +1037,4 @@ ggplot(heat_raw,
   theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "right")
-```
-
-## ADD-on for Effect size ##
-
-```{r add_on_effect_size}
-# Assuming your dataframe is called `included_data`
-# and you have 'age_group' (≤35 vs >35) and 'lifestyle_rank' variables
-
-# Run Mann-Whitney test
-mw_test <- wilcox.test(as.numeric(lifestyle_rank) ~ age_group,
-                       data = included_data,
-                       exact = FALSE,
-                       correct = FALSE)
-
-# Compute Z manually
-# Wilcoxon returns W, need to standardize to Z
-N1 <- sum(included_data$age_group == "≤35")
-N2 <- sum(included_data$age_group == ">35")
-N  <- N1 + N2
-
-U <- mw_test$statistic
-mean_U <- N1 * N2 / 2
-sd_U <- sqrt(N1 * N2 * (N1 + N2 + 1) / 12)
-
-Z <- (U - mean_U) / sd_U
-
-# Compute r effect size
-r <- Z / sqrt(N)
-
-# Print results
-list(
-  W = U,
-  Z = Z,
-  r_effect_size = r
-)
 ```

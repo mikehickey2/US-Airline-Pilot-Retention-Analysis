@@ -1,4 +1,4 @@
-item,statistic,p,p.adj,p.adj.signif,effsize,magnitude
+item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
 Unambiguous SOPs,486,0.655,1,ns,0.05193010303816389,small
 Proactive training,406,0.145,0.725,ns,0.16779878801571857,small
 Well-maintained aircraft,556,0.671,1,ns,0.04952218410657684,small
