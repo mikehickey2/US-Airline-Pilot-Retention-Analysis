@@ -35,6 +35,9 @@ renv/staging/
 # Quarto freeze cache (rendered outputs tracked in output/)
 _freeze/
 
+# Quarto publish temp directory
+_site/
+
 # Archive directory (old code/scripts; documentation preserved in documentation/project_history/)
 archive/
 
