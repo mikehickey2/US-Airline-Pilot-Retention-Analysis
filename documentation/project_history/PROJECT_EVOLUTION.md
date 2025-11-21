@@ -12,7 +12,7 @@ This document traces the development history of the US Airline Pilot Retention A
 | **Cloned From** | [MS-Thesis-US-Airline-Pilot-Retention](https://github.com/mikehickey2/MS-Thesis-US-Airline-Pilot-Retention) |
 | **Purpose** | Article-focused analysis extracted from doctoral thesis |
 
-This repository was created by cloning the original thesis repository and restructuring for journal article publication. The thesis repository contains the complete dissertation work; this repository focuses on the retention factor analysis suitable for peer-reviewed publication.
+This repository was created by cloning the original thesis repository and restructuring for journal article publication. The archived repository contains the complete thesis work; this repository focuses on the retention factor analysis suitable for peer-reviewed publication.
 
 ---
 
