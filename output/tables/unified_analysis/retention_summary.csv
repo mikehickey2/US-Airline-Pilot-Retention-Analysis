@@ -1,7 +1,0 @@
-Demographic,Tests,Min_p_raw,Min_p_adj,Significant_q10
-Age (≤35 vs >35),6,0.00814,0.048839999999999995,1
-Experience Quartiles,6,0.2,0.8340000000000001,0
-Gender (Male vs Female),6,0.0466,0.168,0
-Military Background,6,0.338,0.8412,0
-Flight-Deck Position,6,0.0136,0.08159999999999999,1
-Carrier Type,6,0.0264,0.15839999999999999,0

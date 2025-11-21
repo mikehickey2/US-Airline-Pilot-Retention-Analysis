@@ -1,3 +1,0 @@
-Analysis,Total_Tests,FDR_Method,Significant_FDR,Note
-General Factors,36,BH q=0.10,2,6 factors × 5 demographics (no Position analysis)
-Subfactor Analysis,155,Hierarchical: BH screening + Holm within,5,5 of 6 constructs pass screening
