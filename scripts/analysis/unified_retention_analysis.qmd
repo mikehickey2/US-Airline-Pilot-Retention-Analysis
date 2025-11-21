@@ -1,0 +1,1536 @@
+---
+title: "U.S. Airline Pilot Retention Analysis"
+subtitle: "General Factor Rankings and Subfactor Priorities"
+author:
+  - name: Michael J. Hickey
+    email: michael.j.hickey@und.edu
+    affiliations:
+      - name: University of North Dakota
+    corresponding: true
+  - name: Marina Efthymiou
+    affiliations:
+      - name: Dublin City University
+  - name: James Higgins
+    affiliations:
+      - name: University of North Dakota
+  - name: Aman Gupta
+    affiliations:
+      - name: Embry-Riddle Aeronautical University
+  - name: Robert Walton
+    affiliations:
+      - name: Embry-Riddle Aeronautical University
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    embed-resources: true
+    theme: cosmo
+    number-sections: true
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+# Overview
+
+**Repository:** [https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis](https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis)
+
+This analysis examines pilot retention priorities from a survey of U.S. airline pilots (n = 76). The analysis has two parts:
+
+1.  **General Retention Factors** - Rankings of six broad retention constructs and demographic comparisons
+2.  **Subfactor Analysis** - Within-construct priorities for 31 specific retention elements
+
+![Factors of Pilot Retention in U.S. Airlines](../../documentation/elements_of_retention.png){#fig-retention-factors}
+
+# Statistical Methods
+
+## Sample and Data Collection
+
+Survey data was collected from U.S. airline pilots in May 2025. After exclusions for incomplete responses and non-air carrier pilots, n = 76 valid responses remained for analysis.
+
+## Statistical Tests
+
+All ranking data is ordinal; therefore, non-parametric tests are used throughout:
+
+-   **Friedman Test**: Within-subjects comparison of factor rankings
+-   **Mann-Whitney U**: Between-groups comparison for binary demographics
+-   **Kruskal-Wallis H**: Between-groups comparison for multi-level demographics
+
+## Multiple Testing Correction
+
+This quantitative study employs a **hierarchical false discovery rate (FDR) control procedure**:
+
+**General Factor Analysis (30 tests):** Benjamini-Hochberg FDR at q = 0.10 applied across all demographic comparisons.
+
+**Subfactor Analysis (155 tests):** Two-step hierarchical procedure:
+
+1.  **Screening**: For each construct, compute minimum p-value across demographics. Apply BH-FDR at q = 0.10 to these 6 screening p-values.
+2.  **Within-construct testing**: For constructs passing screening, apply Holm's procedure at alpha = 0.05 to demographic comparisons.
+
+**Rationale**: Standard Bonferroni correction (alpha/155 = 0.0003) is overly conservative for exploratory research, causing 50-70% Type II error rates. FDR control at q = 0.10 balances discovery against false positives appropriately for hypothesis generation.
+
+## Effect Sizes
+
+-   **Mann-Whitney U**: Rank-biserial correlation r (small \< .3, medium .3-.5, large \> .5)
+-   **Kruskal-Wallis**: Eta-squared (small \< .01, medium .01-.06, large \> .06)
+
+## Software
+
+Analysis conducted in R 4.5.1 using: tidyverse, rstatix, coin, DescTools, knitr, janitor.
+
+**Code Availability:** The complete analysis code is available at `scripts/analysis/unified_retention_analysis.qmd` in the GitHub repository: [https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis](https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis)
+
+# Setup
+
+```{r setup}
+#| include: false
+
+# Core tidyverse
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(readr)
+
+# Statistics
+library(rstatix)
+library(DescTools)
+library(coin)  # Required for effect sizes
+
+# Tables and output
+library(knitr)
+library(janitor)
+
+# Utilities
+library(here)
+
+# Global options
+options(scipen = 999)
+knitr::opts_chunk$set(fig.width = 10, fig.height = 6)
+
+# Create output directories
+dir.create("../../output/tables/unified_analysis", showWarnings = FALSE, recursive = TRUE)
+dir.create("../../output/figures/unified_analysis", showWarnings = FALSE, recursive = TRUE)
+```
+
+# Data Loading and Preprocessing
+
+```{r load-data}
+# Load raw survey data
+raw <- read_csv(
+  here("data/processed/retention.csv"),
+  show_col_types = FALSE
+)
+
+# Row 1 = headers; rows 2-3 are survey text & metadata → drop them
+retention_data <- raw %>%
+  slice(-(1:2)) %>%
+  clean_names()
+
+# Remove unwanted metadata columns
+ignore_cols <- c(
+  "start_date", "end_date", "status", "progress", "duration_in_seconds",
+  "recorded_date", "response_id", "distribution_channel",
+  "user_language", "q_recaptcha_score"
+)
+retention_data <- retention_data %>% select(-all_of(ignore_cols))
+
+# Filter out exclusions
+total_records <- nrow(retention_data)
+
+cleaned <- retention_data %>%
+  mutate(
+    finished         = toupper(as.character(finished)),
+    informed_consent = toupper(as.character(informed_consent)),
+    screener         = toupper(as.character(screener))
+  ) %>%
+  mutate(
+    exclusion_reason = case_when(
+      informed_consent != "YES"  ~ "did_not_consent",
+      finished         != "TRUE" ~ "did_not_finish",
+      screener         != "YES"  ~ "not_air_carrier",
+      TRUE                       ~ "included"
+    )
+  )
+
+# Exclusion summary table
+exclusion_table <- cleaned %>%
+  count(exclusion_reason, name = "n")
+
+kable(exclusion_table, caption = "Data Exclusion Summary")
+
+# Keep only included records
+included_data <- cleaned %>%
+  filter(exclusion_reason == "included") %>%
+  select(-exclusion_reason)
+```
+
+```{r recode-demographics}
+#| output: false
+
+# Convert numeric variables
+included_data <- included_data %>%
+  mutate(
+    age = as.numeric(age),
+    experience = as.numeric(experience),
+    total_flying_hours = as.numeric(total_flying_hours)
+  )
+
+# ============================================================================
+# DEMOGRAPHIC VARIABLES
+# ============================================================================
+
+# 1. Age Group (binary: ≤35 vs >35)
+included_data <- included_data %>%
+  mutate(age_group = if_else(age <= 35, "≤ 35", "> 35"))
+
+# 2. Experience Quartiles (4 levels)
+included_data <- included_data %>%
+  mutate(
+    exp_q = ntile(experience, 4),
+    exp_q = factor(exp_q,
+                   levels = 1:4,
+                   labels = c("Q1 (least)", "Q2", "Q3", "Q4 (most)"))
+  )
+
+# 3. Gender (cleaned: Male/Female/Other)
+included_data <- included_data %>%
+  mutate(
+    gender_raw = trimws(gender),
+    gender_clean = case_when(
+      str_starts(tolower(gender_raw), "m")         ~ "Male",
+      str_starts(tolower(gender_raw), "f")         ~ "Female",
+      str_detect(tolower(gender_raw), "non|other") ~ "Other",
+      TRUE                                         ~ NA_character_
+    )
+  )
+
+# 4. Military Background (binary: Yes/No)
+included_data <- included_data %>%
+  mutate(
+    military_clean = case_when(
+      military_experience == "Previously served in the military" ~ "Yes",
+      military_experience == "Never served in the military"      ~ "No",
+      TRUE                                                       ~ NA_character_
+    )
+  )
+
+# 5. Flight-Deck Position (binary: Captain/First Officer)
+included_data <- included_data %>%
+  mutate(
+    position = case_when(
+      str_detect(tolower(position_position), "captain")       ~ "Captain",
+      str_detect(tolower(position_position), "first officer") ~ "First Officer",
+      TRUE                                                    ~ NA_character_
+    )
+  )
+
+# 6. Carrier Type (4 categories)
+included_data <- included_data %>%
+  mutate(
+    carrier_grp = case_when(
+      str_detect(air_carrier_type, "Regional")        ~ "Regional",
+      str_detect(air_carrier_type, "Legacy|Mainline") ~ "Major",
+      str_detect(air_carrier_type, "Low Cost")        ~ "LCC",
+      TRUE                                            ~ "Other"
+    )
+  )
+
+# 7. Respondent ID (for within-subjects tests)
+included_data <- included_data %>%
+  mutate(respondent_id = row_number())
+
+# ============================================================================
+# RENAME GENERAL FACTOR COLUMNS (for Part 1)
+# ============================================================================
+# Map general_1-6 to meaningful names for Part 1 analysis
+included_data <- included_data %>%
+  rename(
+    financial_rank    = general_1,
+    lifestyle_rank    = general_2,
+    professional_rank = general_3,
+    recognition_rank  = general_4,
+    schedule_rank     = general_5,
+    operational_rank  = general_6
+  )
+
+# Store rank column names for Part 1
+rank_cols <- c("financial_rank", "lifestyle_rank", "professional_rank",
+               "recognition_rank", "schedule_rank", "operational_rank")
+```
+
+```{r tbl-sample-summary}
+#| tbl-cap: "Sample Demographic Summary"
+
+# Create sample summary table
+sample_summary <- tibble(
+  Demographic = c("Age Group", "", "Experience", "", "", "",
+                  "Gender", "", "", "Military Background", "",
+                  "Position", "", "Carrier Type", "", "", ""),
+  Category = c("≤ 35 years", "> 35 years",
+               "Q1 (least)", "Q2", "Q3", "Q4 (most)",
+               "Male", "Female", "Other/NA",
+               "Yes", "No",
+               "Captain", "First Officer",
+               "Regional", "Major", "LCC", "Other"),
+  n = c(sum(included_data$age_group == "≤ 35", na.rm = TRUE),
+        sum(included_data$age_group == "> 35", na.rm = TRUE),
+        sum(included_data$exp_q == "Q1 (least)", na.rm = TRUE),
+        sum(included_data$exp_q == "Q2", na.rm = TRUE),
+        sum(included_data$exp_q == "Q3", na.rm = TRUE),
+        sum(included_data$exp_q == "Q4 (most)", na.rm = TRUE),
+        sum(included_data$gender_clean == "Male", na.rm = TRUE),
+        sum(included_data$gender_clean == "Female", na.rm = TRUE),
+        sum(is.na(included_data$gender_clean) | included_data$gender_clean == "Other"),
+        sum(included_data$military_clean == "Yes", na.rm = TRUE),
+        sum(included_data$military_clean == "No", na.rm = TRUE),
+        sum(included_data$position == "Captain", na.rm = TRUE),
+        sum(included_data$position == "First Officer", na.rm = TRUE),
+        sum(included_data$carrier_grp == "Regional", na.rm = TRUE),
+        sum(included_data$carrier_grp == "Major", na.rm = TRUE),
+        sum(included_data$carrier_grp == "LCC", na.rm = TRUE),
+        sum(included_data$carrier_grp == "Other", na.rm = TRUE))
+)
+
+kable(sample_summary)
+```
+
+**Final sample:** `r nrow(included_data)` pilots included in analysis.
+
+# Part 1: General Retention Factor Analysis
+
+This section analyzes the rankings of six broad retention constructs:
+
+1.  Financial (salary, benefits, bonuses)
+2.  Quality of Life/Lifestyle (schedule, family, work-life balance)
+3.  Professional Opportunity (stability, upgrade, aircraft type)
+4.  Recognition (uniform, respect, awards)
+5.  Schedule (fixed vs variable, bidding systems)
+6.  Operational (SOPs, training, equipment, pilot skill)
+
+## Descriptive Statistics
+
+```{r rq1-descriptives}
+# Build long-format data for general factors
+general_long <- included_data %>%
+  select(respondent_id, all_of(rank_cols)) %>%
+  pivot_longer(
+    cols = all_of(rank_cols),
+    names_to = "factor",
+    values_to = "rank"
+  ) %>%
+  mutate(
+    factor = str_remove(factor, "_rank$"),
+    rank = as.numeric(rank)
+  )
+
+# Table 1: Median rank and IQR for each factor
+rank_summary <- general_long %>%
+  group_by(factor) %>%
+  summarise(
+    n      = n(),
+    median = median(rank, na.rm = TRUE),
+    iqr    = IQR(rank, na.rm = TRUE),
+    mean   = mean(rank, na.rm = TRUE),
+    sd     = sd(rank, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(median)
+
+kable(rank_summary, digits = 2,
+      caption = "Table 1: Rank Summary for General Retention Factors")
+
+# Table 2: Count of pilots ranking each factor #1
+top_factor_tbl <- general_long %>%
+  filter(rank == 1) %>%
+  count(factor, name = "n") %>%
+  mutate(percent = n / sum(n) * 100) %>%
+  arrange(desc(n))
+
+kable(top_factor_tbl, digits = 1,
+      caption = "Table 2: Number (and %) of Pilots Ranking Each Factor #1")
+
+# Bar chart: Most important retention factor
+ggplot(top_factor_tbl, aes(x = reorder(factor, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(
+    title = "Figure 1: Most Important Retention Factor",
+    x = "Factor Ranked #1",
+    y = "Number of Pilots"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Friedman Test: Overall Factor Rankings
+
+```{r rq1-friedman}
+# Friedman test: Do the 6 retention factors differ in importance?
+friedman_res <- general_long %>%
+  rstatix::friedman_test(rank ~ factor | respondent_id)
+
+kable(friedman_res, digits = 3,
+      caption = "Friedman Test: Overall Difference in Factor Rankings")
+
+# Post-hoc pairwise comparisons (Wilcoxon signed-rank with Holm adjustment)
+pairwise_tbl <- general_long %>%
+  rstatix::pairwise_wilcox_test(
+    rank ~ factor,
+    paired = TRUE,
+    p.adjust.method = "holm"  # Holm for dependent tests
+  ) %>%
+  mutate(
+    comparison = str_c(group1, " vs ", group2),
+    p.adj = round(p.adj, 4),
+    sig = if_else(p.adj < 0.05, "*", "")
+  ) %>%
+  select(comparison, statistic, p, p.adj, sig)
+
+kable(pairwise_tbl, digits = 4,
+      caption = "Table 3: Pairwise Wilcoxon Tests Between General Factors (Holm-adjusted)")
+```
+
+## Demographic Comparisons
+
+### Age Groups (≤35 vs \>35)
+
+```{r rq2a-age}
+# Long format with age group
+general_age_long <- included_data %>%
+  select(age_group, all_of(rank_cols)) %>%
+  pivot_longer(
+    cols = all_of(rank_cols),
+    names_to = "factor",
+    values_to = "rank"
+  ) %>%
+  mutate(
+    factor = str_remove(factor, "_rank$"),
+    rank = as.numeric(rank)
+  )
+
+# Summary table: medians by age group
+age_medians <- general_age_long %>%
+  group_by(factor, age_group) %>%
+  summarise(
+    n = n(),
+    median = median(rank, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = age_group,
+    values_from = c(n, median),
+    names_glue = "{age_group}_{.value}"
+  )
+
+# Mann-Whitney U tests per factor
+mw_age <- general_age_long %>%
+  group_by(factor) %>%
+  rstatix::wilcox_test(rank ~ age_group, exact = FALSE) %>%
+  ungroup() %>%
+  mutate(
+    p_raw = p,
+    p_adj_fdr = p.adjust(p, method = "BH"),
+    sig_fdr10 = if_else(p_adj_fdr < 0.10, "*", "")
+  ) %>%
+  select(factor, statistic, p_raw, p_adj_fdr, sig_fdr10, n1, n2)
+
+# Combined results
+results_age <- age_medians %>%
+  left_join(mw_age, by = "factor") %>%
+  arrange(p_raw)
+
+kable(results_age, digits = 3,
+      caption = "Table 4: Mann-Whitney U Tests - Age Groups (≤35 vs >35)")
+```
+
+### Experience Quartiles
+
+```{r rq2b-experience}
+# Long format with experience quartiles
+general_exp_long <- included_data %>%
+  select(exp_q, all_of(rank_cols)) %>%
+  pivot_longer(
+    cols = all_of(rank_cols),
+    names_to = "factor",
+    values_to = "rank"
+  ) %>%
+  mutate(
+    factor = str_remove(factor, "_rank$"),
+    rank = as.numeric(rank)
+  )
+
+# Summary table: medians by experience quartile
+exp_medians <- general_exp_long %>%
+  group_by(factor, exp_q) %>%
+  summarise(
+    n = n(),
+    median = median(rank, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = exp_q,
+    values_from = c(n, median),
+    names_glue = "{exp_q}_{.value}"
+  )
+
+kable(exp_medians, digits = 1,
+      caption = "Table 5: Median Rank of General Factors by Experience Quartile")
+
+# Kruskal-Wallis tests per factor
+kw_exp <- general_exp_long %>%
+  group_by(factor) %>%
+  rstatix::kruskal_test(rank ~ exp_q) %>%
+  ungroup() %>%
+  mutate(
+    p_raw = p,
+    p_adj_fdr = p.adjust(p, method = "BH"),
+    sig_fdr10 = if_else(p_adj_fdr < 0.10, "*", "")
+  ) %>%
+  select(factor, statistic, df, p_raw, p_adj_fdr, sig_fdr10)
+
+kable(kw_exp, digits = 3,
+      caption = "Table 6: Kruskal-Wallis Tests for Experience Quartiles (FDR-adjusted)")
+```
+
+### Gender (Male vs Female)
+
+```{r rq2c-gender}
+# Long format with gender (Male/Female only, exclude Other due to n<5)
+general_gender_long <- included_data %>%
+  select(gender_clean, all_of(rank_cols)) %>%
+  pivot_longer(
+    cols = all_of(rank_cols),
+    names_to = "factor",
+    values_to = "rank"
+  ) %>%
+  mutate(
+    factor = str_remove(factor, "_rank$"),
+    rank = as.numeric(rank)
+  ) %>%
+  filter(gender_clean %in% c("Male", "Female"))
+
+# Summary table: medians by gender
+gender_medians <- general_gender_long %>%
+  group_by(factor, gender_clean) %>%
+  summarise(
+    n = n(),
+    median = median(rank, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = gender_clean,
+    values_from = c(n, median),
+    names_glue = "{gender_clean}_{.value}"
+  )
+
+kable(gender_medians, digits = 1,
+      caption = "Table 7: Median Rank of General Factors by Gender")
+
+# Mann-Whitney U tests (EXACT due to small female n=8)
+gender_counts <- table(included_data$gender_clean)
+if (all(c("Male", "Female") %in% names(gender_counts)) &&
+    all(gender_counts[c("Male", "Female")] >= 5)) {
+
+  mw_gender <- general_gender_long %>%
+    group_by(factor) %>%
+    rstatix::wilcox_test(rank ~ gender_clean, exact = TRUE) %>%
+    ungroup() %>%
+    mutate(
+      p_raw = p,
+      p_adj_fdr = p.adjust(p, method = "BH"),
+      sig_fdr10 = if_else(p_adj_fdr < 0.10, "*", "")
+    ) %>%
+    select(factor, statistic, p_raw, p_adj_fdr, sig_fdr10, n1, n2)
+
+  kable(mw_gender, digits = 3,
+        caption = "Table 8: Mann-Whitney U Tests - Male vs Female (Exact test, FDR-adjusted)")
+}
+```
+
+::: {.callout-note}
+**Note on Gender Comparisons:** With only 8 female respondents, statistical power for detecting gender differences is limited. Results should be interpreted cautiously.
+:::
+
+### Military Background
+
+```{r rq2d-military}
+# Long format with military background
+general_mil_long <- included_data %>%
+  select(military_clean, all_of(rank_cols)) %>%
+  pivot_longer(
+    cols = all_of(rank_cols),
+    names_to = "factor",
+    values_to = "rank"
+  ) %>%
+  mutate(
+    factor = str_remove(factor, "_rank$"),
+    rank = as.numeric(rank)
+  ) %>%
+  filter(!is.na(military_clean))
+
+# Summary table: medians by military background
+mil_medians <- general_mil_long %>%
+  group_by(factor, military_clean) %>%
+  summarise(
+    n = n(),
+    median = median(rank, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = military_clean,
+    values_from = c(n, median),
+    names_glue = "{military_clean}_{.value}"
+  )
+
+kable(mil_medians, digits = 1,
+      caption = "Table 9: Median Rank of General Factors by Military Background")
+
+# Mann-Whitney U tests
+mil_counts <- table(included_data$military_clean)
+if (all(mil_counts >= 5)) {
+  mw_mil <- general_mil_long %>%
+    group_by(factor) %>%
+    rstatix::wilcox_test(rank ~ military_clean, exact = FALSE) %>%
+    ungroup() %>%
+    mutate(
+      p_raw = p,
+      p_adj_fdr = p.adjust(p, method = "BH"),
+      sig_fdr10 = if_else(p_adj_fdr < 0.10, "*", "")
+    ) %>%
+    select(factor, statistic, p_raw, p_adj_fdr, sig_fdr10, n1, n2)
+
+  kable(mw_mil, digits = 3,
+        caption = "Table 10: Mann-Whitney U Tests - Military vs Civilian (FDR-adjusted)")
+}
+```
+
+### Flight-Deck Position (Captain vs First Officer)
+
+```{r rq2e-position}
+# Long format with position
+general_pos_long <- included_data %>%
+  select(position, all_of(rank_cols)) %>%
+  pivot_longer(
+    cols = all_of(rank_cols),
+    names_to = "factor",
+    values_to = "rank"
+  ) %>%
+  mutate(
+    factor = str_remove(factor, "_rank$"),
+    rank = as.numeric(rank)
+  ) %>%
+  filter(!is.na(position))
+
+# Summary table: medians by position
+pos_medians <- general_pos_long %>%
+  group_by(factor, position) %>%
+  summarise(
+    n = n(),
+    median = median(rank, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = position,
+    values_from = c(n, median),
+    names_glue = "{position}_{.value}"
+  )
+
+kable(pos_medians, digits = 1,
+      caption = "Table 11: Median Rank of General Factors by Flight-Deck Position")
+
+# Mann-Whitney U tests
+pos_counts <- table(included_data$position)
+if (all(pos_counts >= 5)) {
+  mw_pos <- general_pos_long %>%
+    group_by(factor) %>%
+    rstatix::wilcox_test(rank ~ position, exact = FALSE) %>%
+    ungroup() %>%
+    mutate(
+      p_raw = p,
+      p_adj_fdr = p.adjust(p, method = "BH"),
+      sig_fdr10 = if_else(p_adj_fdr < 0.10, "*", "")
+    ) %>%
+    select(factor, statistic, p_raw, p_adj_fdr, sig_fdr10, n1, n2)
+
+  kable(mw_pos, digits = 3,
+        caption = "Table 12: Mann-Whitney U Tests - Captain vs First Officer (FDR-adjusted)")
+}
+```
+
+### Carrier Type
+
+```{r rq2f-carrier}
+# Long format with carrier type
+general_carrier_long <- included_data %>%
+  select(carrier_grp, all_of(rank_cols)) %>%
+  pivot_longer(
+    cols = all_of(rank_cols),
+    names_to = "factor",
+    values_to = "rank"
+  ) %>%
+  mutate(
+    factor = str_remove(factor, "_rank$"),
+    rank = as.numeric(rank)
+  )
+
+# Summary table: medians by carrier type
+carrier_medians <- general_carrier_long %>%
+  group_by(factor, carrier_grp) %>%
+  summarise(
+    n = n(),
+    median = median(rank, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = carrier_grp,
+    values_from = c(n, median),
+    names_glue = "{carrier_grp}_{.value}"
+  )
+
+kable(carrier_medians, digits = 1,
+      caption = "Table 13: Median Rank of General Factors by Carrier Type")
+
+# Kruskal-Wallis tests per factor
+kw_carrier <- general_carrier_long %>%
+  group_by(factor) %>%
+  rstatix::kruskal_test(rank ~ carrier_grp) %>%
+  ungroup() %>%
+  mutate(
+    p_raw = p,
+    p_adj_fdr = p.adjust(p, method = "BH"),
+    sig_fdr10 = if_else(p_adj_fdr < 0.10, "*", "")
+  ) %>%
+  select(factor, statistic, df, p_raw, p_adj_fdr, sig_fdr10)
+
+kable(kw_carrier, digits = 3,
+      caption = "Table 14: Kruskal-Wallis Tests Across Carrier Types (FDR-adjusted)")
+```
+
+## Summary: General Factor Results
+
+```{r summary-retention}
+# Helper function to safely extract summary stats from test results
+calc_summary <- function(obj, label) {
+  if (!exists(deparse(substitute(obj)), inherits = TRUE) || is.null(obj)) {
+    return(tibble(
+      Demographic = label,
+      Tests = 0,
+      Min_p_raw = NA_real_,
+      Min_p_adj = NA_real_,
+      Significant_q10 = NA_integer_
+    ))
+  }
+
+  if (!("p_raw" %in% names(obj))) {
+    return(tibble(
+      Demographic = label,
+      Tests = 0,
+      Min_p_raw = NA_real_,
+      Min_p_adj = NA_real_,
+      Significant_q10 = NA_integer_
+    ))
+  }
+
+  sig_count <- if ("sig_fdr10" %in% names(obj)) sum(obj$sig_fdr10 == "*", na.rm = TRUE) else 0
+
+  tibble(
+    Demographic = label,
+    Tests = nrow(obj),
+    Min_p_raw = min(obj$p_raw, na.rm = TRUE),
+    Min_p_adj = min(obj$p_adj_fdr, na.rm = TRUE),
+    Significant_q10 = sig_count
+  )
+}
+
+# Build summary table
+retention_summary <- bind_rows(
+  calc_summary(mw_age, "Age (≤35 vs >35)"),
+  calc_summary(kw_exp, "Experience Quartiles"),
+  if (exists("mw_gender")) calc_summary(mw_gender, "Gender (Male vs Female)") else tibble(Demographic = "Gender", Tests = 0, Min_p_raw = NA, Min_p_adj = NA, Significant_q10 = NA),
+  if (exists("mw_mil")) calc_summary(mw_mil, "Military Background") else tibble(Demographic = "Military", Tests = 0, Min_p_raw = NA, Min_p_adj = NA, Significant_q10 = NA),
+  if (exists("mw_pos")) calc_summary(mw_pos, "Flight-Deck Position") else tibble(Demographic = "Position", Tests = 0, Min_p_raw = NA, Min_p_adj = NA, Significant_q10 = NA),
+  calc_summary(kw_carrier, "Carrier Type")
+)
+
+kable(retention_summary, digits = 4,
+      caption = "Summary: General Factor Demographic Comparisons (BH-FDR at q=0.10)")
+
+# Calculate total tests and significant findings
+total_tests <- sum(retention_summary$Tests, na.rm = TRUE)
+total_sig <- sum(retention_summary$Significant_q10, na.rm = TRUE)
+fdr_rate <- round(total_sig / total_tests * 100, 1)
+
+# Save summary to CSV
+write_csv(retention_summary, "../../output/tables/unified_analysis/retention_summary.csv")
+```
+
+**General Factor Analysis Summary:**
+
+- Total demographic comparisons: `r total_tests`
+- Significant at FDR q=0.10: `r total_sig`
+- Discovery rate: `r fdr_rate`%
+
+# Part 2: Subfactor Analysis
+
+This section examines the 31 subfactors within each retention construct and tests for demographic differences in within-construct priorities.
+
+```{r subfactor-setup}
+#' ============================================================================
+#' SUBFACTOR ANALYSIS HELPER FUNCTIONS
+#' ============================================================================
+#' These functions replace ~600 lines of duplicated code with reusable components.
+#' See documentation/function_architecture.md for design details.
+
+# Default demographics configuration
+default_demographics <- list(
+  age = list(var = "age_group", type = "binary", exact = FALSE),
+  gender = list(var = "gender_clean", type = "binary", exact = FALSE),
+  position = list(var = "position", type = "binary", exact = FALSE),
+  military = list(var = "military_clean", type = "binary", exact = FALSE),
+  experience = list(var = "exp_q", type = "multi", exact = FALSE)
+)
+
+#' Safe Mann-Whitney U test with effect sizes
+#' @param data Data frame in long format
+#' @param formula Formula for the test (rank ~ grouping_var)
+#' @param exact Use exact test (required for small samples)
+safe_wilcox_test <- function(data, formula, exact = FALSE) {
+  group_var <- all.vars(formula)[2]
+  n_groups <- data %>%
+    filter(!is.na(.data[[group_var]])) %>%
+    pull(.data[[group_var]]) %>%
+    n_distinct()
+
+  if (n_groups < 2) {
+    return(tibble(
+      .y. = character(), group1 = character(), group2 = character(),
+      n1 = integer(), n2 = integer(), statistic = numeric(),
+      p = numeric(), effsize = numeric(), magnitude = character()
+    ))
+  }
+
+  test_result <- tryCatch({
+    rstatix::wilcox_test(data, formula, exact = exact)
+  }, error = function(e) {
+    return(tibble(
+      .y. = character(), group1 = character(), group2 = character(),
+      n1 = integer(), n2 = integer(), statistic = numeric(), p = numeric()
+    ))
+  })
+
+  if (nrow(test_result) == 0) {
+    return(tibble(
+      .y. = character(), group1 = character(), group2 = character(),
+      n1 = integer(), n2 = integer(), statistic = numeric(),
+      p = numeric(), effsize = numeric(), magnitude = character()
+    ))
+  }
+
+  effsize_result <- tryCatch({
+    rstatix::wilcox_effsize(data, formula)
+  }, error = function(e) {
+    test_result %>%
+      select(any_of(c("item", ".y."))) %>%
+      distinct() %>%
+      mutate(effsize = NA_real_, magnitude = NA_character_)
+  })
+
+  test_result %>%
+    left_join(
+      effsize_result %>% select(any_of(c("item", ".y.", "effsize", "magnitude"))),
+      by = intersect(names(test_result), c("item", ".y."))
+    )
+}
+
+#' Safe Kruskal-Wallis test with effect sizes
+#' @param data Data frame in long format
+#' @param formula Formula for the test (rank ~ grouping_var)
+safe_kruskal_test <- function(data, formula) {
+  group_var <- all.vars(formula)[2]
+  n_groups <- data %>%
+    filter(!is.na(.data[[group_var]])) %>%
+    pull(.data[[group_var]]) %>%
+    n_distinct()
+
+  if (n_groups < 2) {
+    return(tibble(
+      .y. = character(), n = integer(), statistic = numeric(),
+      df = integer(), p = numeric(), effsize = numeric(), magnitude = character()
+    ))
+  }
+
+  test_result <- tryCatch({
+    rstatix::kruskal_test(data, formula)
+  }, error = function(e) {
+    return(tibble(
+      .y. = character(), n = integer(), statistic = numeric(),
+      df = integer(), p = numeric()
+    ))
+  })
+
+  if (nrow(test_result) == 0) {
+    return(tibble(
+      .y. = character(), n = integer(), statistic = numeric(),
+      df = integer(), p = numeric(), effsize = numeric(), magnitude = character()
+    ))
+  }
+
+  effsize_result <- tryCatch({
+    rstatix::kruskal_effsize(data, formula)
+  }, error = function(e) {
+    test_result %>%
+      select(any_of(c("item", ".y."))) %>%
+      distinct() %>%
+      mutate(effsize = NA_real_, magnitude = NA_character_)
+  })
+
+  test_result %>%
+    left_join(
+      effsize_result %>% select(any_of(c("item", ".y.", "effsize", "magnitude"))),
+      by = intersect(names(test_result), c("item", ".y."))
+    )
+}
+
+#' Prepare construct data: convert wide to long with respondent ID
+#' @param data Full dataset
+#' @param var_cols Character vector of column names for this construct
+#' @param demographics List of demographic configurations
+prepare_construct_data <- function(data, var_cols, demographics) {
+  # Hardcode demographic column names (they're constant for this analysis)
+  demo_cols <- c("age_group", "gender_clean", "position", "military_clean", "exp_q")
+
+  # Select columns and create respondent ID
+  selected_data <- data %>%
+    select(all_of(demo_cols), all_of(var_cols)) %>%
+    mutate(respondent_id = row_number()) %>%
+    mutate(across(all_of(var_cols), as.numeric))
+
+  # Pivot to long format - demographic columns are preserved
+  result <- selected_data %>%
+    pivot_longer(
+      cols = all_of(var_cols),
+      names_to = "item",
+      values_to = "rank"
+    ) %>%
+    filter(!is.na(rank))
+
+  return(result)
+}
+
+#' Compute descriptive statistics for construct items
+#' @param long_data Data in long format
+#' @param item_labels Named vector mapping var names to labels
+compute_descriptives <- function(long_data, item_labels) {
+  long_data %>%
+    group_by(item) %>%
+    summarise(
+      n = n(),
+      median = median(rank),
+      mean = mean(rank),
+      sd = sd(rank),
+      pct_rank1 = sum(rank == 1) / n() * 100,
+      .groups = "drop"
+    ) %>%
+    mutate(item = recode(item, !!!item_labels))
+}
+
+#' Run Friedman test for within-construct ranking differences
+#' @param long_data Data in long format with respondent_id
+run_friedman_test <- function(long_data) {
+  long_data %>%
+    rstatix::friedman_test(rank ~ item | respondent_id)
+}
+
+#' Run demographic comparison (Mann-Whitney or Kruskal-Wallis)
+#' @param long_data Data in long format
+#' @param demo_var Name of demographic variable
+#' @param demo_type "binary" for MW, "multi" for KW
+#' @param exact Use exact test
+#' @param item_labels Named vector for recoding item names
+run_demographic_comparison <- function(long_data, demo_var, demo_type, exact, item_labels) {
+  # Filter out NA values for the demographic variable
+  filtered_data <- long_data %>%
+    filter(!is.na(.data[[demo_var]]))
+
+  # Create formula using reformulate (avoids tidyeval issues)
+  test_formula <- reformulate(demo_var, "rank")
+
+  if (demo_type == "binary") {
+    result <- filtered_data %>%
+      group_by(item) %>%
+      safe_wilcox_test(test_formula, exact = exact) %>%
+      ungroup()
+  } else {
+    result <- filtered_data %>%
+      group_by(item) %>%
+      safe_kruskal_test(test_formula) %>%
+      ungroup()
+  }
+
+  if (nrow(result) > 0) {
+    result <- result %>%
+      mutate(p_raw = p) %>%
+      rstatix::adjust_pvalue(method = "holm") %>%
+      rstatix::add_significance("p.adj") %>%
+      select(-p) %>%  # Remove original p before renaming
+      rename(p = p_raw, p_adj_holm = p.adj) %>%
+      mutate(item = recode(item, !!!item_labels))
+
+    if (demo_type == "binary") {
+      result <- result %>%
+        select(item, statistic, p, p_adj_holm, p.adj.signif, effsize, magnitude)
+    } else {
+      result <- result %>%
+        select(item, statistic, df, p, p_adj_holm, p.adj.signif, effsize, magnitude)
+    }
+  }
+
+  return(result)
+}
+
+#' Create median rank bar chart
+#' @param desc_stats Descriptive statistics tibble
+#' @param construct_name Name for title
+#' @param color Fill color for bars
+create_median_rank_chart <- function(desc_stats, construct_name, color = "steelblue") {
+  desc_stats %>%
+    mutate(item = fct_reorder(item, desc(median))) %>%
+    ggplot(aes(x = median, y = item)) +
+    geom_col(fill = color, alpha = 0.8) +
+    geom_text(aes(label = sprintf("%.1f", median)), hjust = -0.2, size = 3) +
+    labs(
+      title = paste(construct_name, "Subfactor Priorities"),
+      subtitle = "Median rank (lower = higher priority)",
+      x = "Median Rank",
+      y = NULL
+    ) +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold"))
+}
+
+#' Export all tables for a construct to CSV
+#' @param construct_name Name (used for file prefix)
+#' @param desc_stats Descriptive statistics
+#' @param friedman_result Friedman test result
+#' @param demo_results List of demographic comparison results
+#' @param output_dir Directory for output files
+export_construct_tables <- function(construct_name, desc_stats, friedman_result, demo_results, output_dir) {
+  prefix <- tolower(gsub(" ", "_", construct_name))
+
+  write_csv(desc_stats, file.path(output_dir, paste0(prefix, "_descriptive.csv")))
+  write_csv(friedman_result, file.path(output_dir, paste0(prefix, "_friedman.csv")))
+
+  demo_names <- c("age", "gender", "position", "military", "experience")
+  for (name in demo_names) {
+    if (!is.null(demo_results[[name]]) && nrow(demo_results[[name]]) > 0) {
+      write_csv(demo_results[[name]], file.path(output_dir, paste0(prefix, "_", name, ".csv")))
+    }
+  }
+}
+
+#' Main function: analyze one construct completely
+#' @param data Full dataset
+#' @param construct_name Display name (e.g., "Financial")
+#' @param var_cols Character vector of actual column names
+#' @param item_labels Named vector mapping var names to readable labels
+#' @param demographics List of demographic configurations
+#' @param output_dir Directory for CSV output
+#' @param plot_color Color for bar chart
+analyze_construct <- function(
+  data,
+  construct_name,
+  var_cols,
+  item_labels,
+  demographics = default_demographics,
+  output_dir = "../../output/tables/subfactor_analysis",
+  plot_color = "steelblue"
+) {
+  # 1. Prepare long-format data
+
+  long_data <- prepare_construct_data(data, var_cols, demographics)
+
+  # 2. Descriptive statistics
+  desc_stats <- compute_descriptives(long_data, item_labels)
+
+  # 3. Friedman test
+  friedman_result <- run_friedman_test(long_data)
+
+  # 4. Create visualization
+  fig <- create_median_rank_chart(desc_stats, construct_name, plot_color)
+
+  # 5. Run all demographic comparisons
+  demo_results <- list()
+  for (demo_name in names(demographics)) {
+    demo_config <- demographics[[demo_name]]
+    demo_results[[demo_name]] <- run_demographic_comparison(
+      long_data,
+      demo_var = demo_config$var,
+      demo_type = demo_config$type,
+      exact = demo_config$exact,
+      item_labels = item_labels
+    )
+  }
+
+  # 6. Compute screening p-value (minimum across all demographics)
+  all_p_values <- purrr::map(demo_results, ~{
+    if (nrow(.x) > 0 && "p" %in% names(.x)) min(.x$p, na.rm = TRUE) else 1
+  })
+  screening_p <- min(unlist(all_p_values), na.rm = TRUE)
+
+  # 7. Export all tables
+  export_construct_tables(construct_name, desc_stats, friedman_result, demo_results, output_dir)
+
+  # 8. Save figure
+  fig_path <- file.path(
+    gsub("tables", "figures", output_dir),
+    paste0(tolower(gsub(" ", "_", construct_name)), "_median_ranks.png")
+  )
+  ggsave(fig_path, fig, width = 8, height = 5, dpi = 300)
+
+  # Return results
+  list(
+    construct_name = construct_name,
+    descriptive_stats = desc_stats,
+    friedman_result = friedman_result,
+    demographic_results = demo_results,
+    screening_p = screening_p,
+    figure = fig
+  )
+}
+```
+
+```{r subfactor-labels}
+# Variable labels from survey instrument
+financial_labels <- c(
+  "financial_1" = "Competitive salary",
+  "financial_2" = "Allowances and soft pay",
+  "financial_3" = "Benefits package",
+  "financial_4" = "Disability insurance",
+  "financial_5" = "Job security",
+  "financial_6" = "New hire/longevity bonuses"
+)
+
+qol_labels <- c(
+  "qo_l_1" = "Predictable schedule",
+  "qo_l_2" = "Vacation time",
+  "qo_l_3" = "Family-friendly policies",
+  "qo_l_4" = "Possibility of being based at home",
+  "qo_l_5" = "Travel benefits",
+  "qo_l_6" = "Work-life balance"
+)
+
+professional_labels <- c(
+  "professional_1" = "Financially stable airline",
+  "professional_2" = "Opportunity for rapid upgrade",
+  "professional_3" = "Opportunity to fly larger aircraft",
+  "professional_4" = "Promotion/upgrade based on merit",
+  "professional_5" = "Upgrade based on length of service"
+)
+
+recognition_labels <- c(
+  "recognition_1" = "Professional-looking uniforms",
+  "recognition_3" = "Additional vacation for long service",
+  "recognition_4" = "Recognition as a professional",
+  "recognition_7" = "Airline recognition"
+)
+
+schedule_labels <- c(
+  "schedule_1" = "Fixed schedule",
+  "schedule_2" = "Variable schedule",
+  "schedule_3" = "Flexible work rules",
+  "schedule_4" = "Bid line seniority system",
+  "schedule_5" = "Vacation bidding rules"
+)
+
+operational_labels <- c(
+  "operational_1" = "Unambiguous SOPs",
+  "operational_2" = "Proactive training environment",
+  "operational_3" = "Well-maintained aircraft",
+  "operational_4" = "Well-equipped aircraft",
+  "operational_5" = "Highly skilled fellow pilots"
+)
+
+# Construct configuration: maps construct name to column names, labels, and colors
+constructs_config <- list(
+  financial = list(
+    name = "Financial",
+    vars = c("financial_1", "financial_2", "financial_3", "financial_4", "financial_5", "financial_6"),
+    labels = financial_labels,
+    color = "steelblue"
+  ),
+  qol = list(
+    name = "Quality of Life",
+    vars = c("qo_l_1", "qo_l_2", "qo_l_3", "qo_l_4", "qo_l_5", "qo_l_6"),
+    labels = qol_labels,
+    color = "forestgreen"
+  ),
+  professional = list(
+    name = "Professional",
+    vars = c("professional_1", "professional_2", "professional_3", "professional_4", "professional_5"),
+    labels = professional_labels,
+    color = "darkorange"
+  ),
+  recognition = list(
+    name = "Recognition",
+    vars = c("recognition_1", "recognition_3", "recognition_4", "recognition_7"),
+    labels = recognition_labels,
+    color = "purple"
+  ),
+  schedule = list(
+    name = "Schedule",
+    vars = c("schedule_1", "schedule_2", "schedule_3", "schedule_4", "schedule_5"),
+    labels = schedule_labels,
+    color = "firebrick"
+  ),
+  operational = list(
+    name = "Operational",
+    vars = c("operational_1", "operational_2", "operational_3", "operational_4", "operational_5"),
+    labels = operational_labels,
+    color = "darkslategray"
+  )
+)
+```
+
+## Financial Subfactors
+
+```{r analyze-financial}
+results_financial <- analyze_construct(
+  data = included_data,
+  construct_name = constructs_config$financial$name,
+  var_cols = constructs_config$financial$vars,
+  item_labels = constructs_config$financial$labels,
+  demographics = default_demographics,
+  plot_color = constructs_config$financial$color
+)
+
+kable(results_financial$descriptive_stats, digits = 2,
+      caption = "Financial Subfactors - Descriptive Statistics")
+kable(results_financial$friedman_result, digits = 3,
+      caption = "Financial: Friedman Test")
+print(results_financial$figure)
+
+kable(results_financial$demographic_results$age, digits = 3,
+      caption = "Financial: Age Group Comparisons")
+kable(results_financial$demographic_results$gender, digits = 3,
+      caption = "Financial: Gender Comparisons")
+kable(results_financial$demographic_results$position, digits = 3,
+      caption = "Financial: Position Comparisons")
+kable(results_financial$demographic_results$military, digits = 3,
+      caption = "Financial: Military Comparisons")
+kable(results_financial$demographic_results$experience, digits = 3,
+      caption = "Financial: Experience Comparisons")
+```
+
+## Quality of Life Subfactors
+
+```{r analyze-qol}
+results_qol <- analyze_construct(
+  data = included_data,
+  construct_name = constructs_config$qol$name,
+  var_cols = constructs_config$qol$vars,
+  item_labels = constructs_config$qol$labels,
+  demographics = default_demographics,
+  plot_color = constructs_config$qol$color
+)
+
+kable(results_qol$descriptive_stats, digits = 2,
+      caption = "Quality of Life Subfactors - Descriptive Statistics")
+kable(results_qol$friedman_result, digits = 3,
+      caption = "Quality of Life: Friedman Test")
+print(results_qol$figure)
+
+kable(results_qol$demographic_results$age, digits = 3,
+      caption = "Quality of Life: Age Group Comparisons")
+kable(results_qol$demographic_results$gender, digits = 3,
+      caption = "Quality of Life: Gender Comparisons")
+kable(results_qol$demographic_results$position, digits = 3,
+      caption = "Quality of Life: Position Comparisons")
+kable(results_qol$demographic_results$military, digits = 3,
+      caption = "Quality of Life: Military Comparisons")
+kable(results_qol$demographic_results$experience, digits = 3,
+      caption = "Quality of Life: Experience Comparisons")
+```
+
+## Professional Opportunity Subfactors
+
+```{r analyze-professional}
+results_professional <- analyze_construct(
+  data = included_data,
+  construct_name = constructs_config$professional$name,
+  var_cols = constructs_config$professional$vars,
+  item_labels = constructs_config$professional$labels,
+  demographics = default_demographics,
+  plot_color = constructs_config$professional$color
+)
+
+kable(results_professional$descriptive_stats, digits = 2,
+      caption = "Professional Subfactors - Descriptive Statistics")
+kable(results_professional$friedman_result, digits = 3,
+      caption = "Professional: Friedman Test")
+print(results_professional$figure)
+
+kable(results_professional$demographic_results$age, digits = 3,
+      caption = "Professional: Age Group Comparisons")
+kable(results_professional$demographic_results$gender, digits = 3,
+      caption = "Professional: Gender Comparisons")
+kable(results_professional$demographic_results$position, digits = 3,
+      caption = "Professional: Position Comparisons")
+kable(results_professional$demographic_results$military, digits = 3,
+      caption = "Professional: Military Comparisons")
+kable(results_professional$demographic_results$experience, digits = 3,
+      caption = "Professional: Experience Comparisons")
+```
+
+## Recognition Subfactors
+
+```{r analyze-recognition}
+results_recognition <- analyze_construct(
+  data = included_data,
+  construct_name = constructs_config$recognition$name,
+  var_cols = constructs_config$recognition$vars,
+  item_labels = constructs_config$recognition$labels,
+  demographics = default_demographics,
+  plot_color = constructs_config$recognition$color
+)
+
+kable(results_recognition$descriptive_stats, digits = 2,
+      caption = "Recognition Subfactors - Descriptive Statistics")
+kable(results_recognition$friedman_result, digits = 3,
+      caption = "Recognition: Friedman Test")
+print(results_recognition$figure)
+
+kable(results_recognition$demographic_results$age, digits = 3,
+      caption = "Recognition: Age Group Comparisons")
+kable(results_recognition$demographic_results$gender, digits = 3,
+      caption = "Recognition: Gender Comparisons")
+kable(results_recognition$demographic_results$position, digits = 3,
+      caption = "Recognition: Position Comparisons")
+kable(results_recognition$demographic_results$military, digits = 3,
+      caption = "Recognition: Military Comparisons")
+kable(results_recognition$demographic_results$experience, digits = 3,
+      caption = "Recognition: Experience Comparisons")
+```
+
+## Schedule Subfactors
+
+```{r analyze-schedule}
+results_schedule <- analyze_construct(
+  data = included_data,
+  construct_name = constructs_config$schedule$name,
+  var_cols = constructs_config$schedule$vars,
+  item_labels = constructs_config$schedule$labels,
+  demographics = default_demographics,
+  plot_color = constructs_config$schedule$color
+)
+
+kable(results_schedule$descriptive_stats, digits = 2,
+      caption = "Schedule Subfactors - Descriptive Statistics")
+kable(results_schedule$friedman_result, digits = 3,
+      caption = "Schedule: Friedman Test")
+print(results_schedule$figure)
+
+kable(results_schedule$demographic_results$age, digits = 3,
+      caption = "Schedule: Age Group Comparisons")
+kable(results_schedule$demographic_results$gender, digits = 3,
+      caption = "Schedule: Gender Comparisons")
+kable(results_schedule$demographic_results$position, digits = 3,
+      caption = "Schedule: Position Comparisons")
+kable(results_schedule$demographic_results$military, digits = 3,
+      caption = "Schedule: Military Comparisons")
+kable(results_schedule$demographic_results$experience, digits = 3,
+      caption = "Schedule: Experience Comparisons")
+```
+
+## Operational Subfactors
+
+```{r analyze-operational}
+results_operational <- analyze_construct(
+  data = included_data,
+  construct_name = constructs_config$operational$name,
+  var_cols = constructs_config$operational$vars,
+  item_labels = constructs_config$operational$labels,
+  demographics = default_demographics,
+  plot_color = constructs_config$operational$color
+)
+
+kable(results_operational$descriptive_stats, digits = 2,
+      caption = "Operational Subfactors - Descriptive Statistics")
+kable(results_operational$friedman_result, digits = 3,
+      caption = "Operational: Friedman Test")
+print(results_operational$figure)
+
+kable(results_operational$demographic_results$age, digits = 3,
+      caption = "Operational: Age Group Comparisons")
+kable(results_operational$demographic_results$gender, digits = 3,
+      caption = "Operational: Gender Comparisons")
+kable(results_operational$demographic_results$position, digits = 3,
+      caption = "Operational: Position Comparisons")
+kable(results_operational$demographic_results$military, digits = 3,
+      caption = "Operational: Military Comparisons")
+kable(results_operational$demographic_results$experience, digits = 3,
+      caption = "Operational: Experience Comparisons")
+```
+
+## Hierarchical FDR Screening Results
+
+```{r screening-results}
+# Collect all construct results
+all_construct_results <- list(
+  financial = results_financial,
+  qol = results_qol,
+  professional = results_professional,
+  recognition = results_recognition,
+  schedule = results_schedule,
+  operational = results_operational
+)
+
+# Create screening results table
+screening_results <- tibble(
+  construct = purrr::map_chr(all_construct_results, "construct_name"),
+  n_subfactors = c(6, 6, 5, 4, 5, 5),  # Number of items per construct
+  min_p = purrr::map_dbl(all_construct_results, "screening_p")
+) %>%
+  arrange(min_p) %>%
+  mutate(
+    rank = row_number(),
+    p_adj_fdr = p.adjust(min_p, method = "BH"),
+    passes_screen = p_adj_fdr < 0.10,
+    decision = if_else(passes_screen,
+                       "Proceed to detailed testing",
+                       "No demographic differences detected")
+  )
+
+kable(screening_results, digits = 4,
+      caption = "Construct-Level Screening: Benjamini-Hochberg FDR (q=0.10)")
+
+# Summary
+n_significant <- sum(screening_results$passes_screen)
+
+# Save screening results
+write_csv(screening_results, "../../output/tables/subfactor_analysis/screening_results.csv")
+```
+
+**Screening Summary:**
+
+- Constructs passing FDR screen (p_adj < 0.10): `r n_significant` of 6
+
+::: {.callout-note}
+For constructs passing screening, demographic comparisons have been adjusted using Holm's procedure. Tests with p_adj_holm < 0.05 indicate significant demographic differences in subfactor prioritization.
+:::
+
+# Combined Results Summary
+
+```{r summary-combined}
+# Combined summary across both analyses
+
+# Part 1: General factor tests
+general_tests <- total_tests
+general_sig_fdr <- total_sig
+
+# Part 2: Subfactor tests (5 demographics × 31 subfactors = 155 tests)
+subfactor_tests <- 155
+subfactor_constructs_screened <- sum(screening_results$passes_screen)
+
+# Create combined summary
+combined_summary <- tibble(
+  Analysis = c("General Factors", "Subfactor Analysis"),
+  Total_Tests = c(general_tests, subfactor_tests),
+  FDR_Method = c("BH q=0.10", "Hierarchical: BH screening + Holm within"),
+  Significant_FDR = c(general_sig_fdr, subfactor_constructs_screened),
+  Note = c(
+    "6 factors × 5 demographics (no Position analysis)",
+    paste0(subfactor_constructs_screened, " of 6 constructs pass screening")
+  )
+)
+
+kable(combined_summary,
+      caption = "Combined Analysis Summary: Multiple Testing Approach")
+
+# Identify constructs passing screening for inline reporting
+significant_constructs <- screening_results %>%
+  filter(passes_screen) %>%
+  pull(construct)
+sig_constructs_text <- paste(significant_constructs, collapse = ", ")
+
+# Save combined summary
+write_csv(combined_summary, "../../output/tables/unified_analysis/combined_summary.csv")
+```
+
+## Summary
+
+**General Retention Factors (Part 1):**
+
+- Total demographic comparisons: `r general_tests`
+- Significant at FDR q=0.10: `r general_sig_fdr`
+
+**Subfactor Analysis (Part 2):**
+
+- Constructs analyzed: 6
+- Total subfactors: 31
+- Constructs passing FDR screening: `r subfactor_constructs_screened`
+- Constructs with demographic differences: `r sig_constructs_text`
+
+::: {.callout-tip}
+## Interpretation
+The hierarchical FDR procedure controls for the 155 subfactor tests by:
+
+1. Screening at construct level (BH-FDR q=0.10 on 6 tests)
+2. Applying Holm correction within constructs that pass screening
+
+This approach maintains family-wise error rate control while preserving power to detect genuine demographic differences.
+:::
+
+# Limitations
+
+::: {.callout-warning}
+## Statistical Power Considerations
+With n = 76, this study has limited statistical power. Non-significant results should **not** be interpreted as evidence of no effect. Many analyses may be underpowered to detect small-to-medium effects.
+:::
+
+This analysis has several important limitations:
+
+## Sample Size and Power
+
+The total sample of n = 76 provides adequate power only for detecting large effects (Cohen's d > 0.8 or r > 0.5). For demographic comparisons:
+
+| Comparison | Group Sizes | Detectable Effect (80% power) |
+|------------|-------------|-------------------------------|
+| Age groups | ~40 vs ~36 | Medium (r ≈ 0.35) |
+| Experience | ~19 per quartile | Large (eta² > 0.10) |
+| Gender | 67 vs 8 | Very large only (r > 0.6) |
+| Military | ~35 vs ~40 | Medium (r ≈ 0.35) |
+| Position | ~45 vs ~30 | Medium (r ≈ 0.35) |
+
+**Gender comparisons warrant particular caution**: With only 8 female respondents, the analysis has approximately 20% power to detect medium effects - meaning 80% of true medium-sized gender differences would go undetected.
+
+## Additional Limitations
+
+1.  **Multiple Testing Burden**: Despite FDR control, the large number of tests (155 in subfactor analysis) increases false discovery risk; the expected number of false discoveries at q=0.10 is approximately 10% of significant findings
+2.  **Self-Selection Bias**: Survey respondents may not represent all U.S. airline pilots; those with strong opinions about retention may be overrepresented
+3.  **Cross-Sectional Design**: Retention priorities may change over career stage; this snapshot cannot capture temporal dynamics
+4.  **Ranking Methodology**: Forced rankings prevent assessment of absolute importance; factors ranked low may still be important in absolute terms
+
+# References
+
+## Primary Sources
+
+Hickey, M. J. (2025). *Rethinking pilot retention in the United States: An analysis of key factors* [Doctoral dissertation, University of North Dakota]. ProQuest Dissertations & Theses. https://www.proquest.com/docview/3246414757
+
+Efthymiou, M., Njoya, E. T., Lo, P. L., Papatheodorou, A., & Randall, D. (2020). The factors influencing entry level airline pilot retention: An empirical study of Ryanair. *Journal of Air Transport Management*, 91, 101997. https://doi.org/10.1016/j.jairtraman.2020.101997
+
+## Statistical Methods
+
+Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. *Journal of the Royal Statistical Society: Series B*, 57(1), 289-300.
+
+Bender, R., & Lange, S. (1999). Multiple test procedures other than Bonferroni's deserve wider use. *BMJ*, 318(7183), 600-601.
+
+Armstrong, R. A. (2014). When to use the Bonferroni correction. *Ophthalmic and Physiological Optics*, 34(5), 502-508.
+
+Li, J., & Ghosh, J. K. (2014). A two-step hierarchical hypothesis set testing framework. *BMC Bioinformatics*, 15, 108.

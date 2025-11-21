@@ -31,3 +31,6 @@ renv/staging/
 
 /.quarto/
 **/*.quarto_ipynb
+
+# Claude Code settings (local agent configurations)
+.claude/

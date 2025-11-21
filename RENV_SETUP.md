@@ -1,133 +1,160 @@
 # renv Setup - Clean Minimal Configuration
 
-## ✅ Rebuild Complete!
+## Current Status: In Sync
 
-Your renv environment has been successfully rebuilt with **only the packages needed for this project**.
+Your renv environment is configured and working. All packages needed for the unified analysis are installed.
 
-### What Changed
+### Core Packages
 
-**Before:** 200+ packages with broken symlinks and compilation errors
+| Package | Purpose |
+|---------|---------|
+| tidyverse | Data manipulation (dplyr, ggplot2, tidyr, readr, stringr, purrr) |
+| rstatix | Statistical tests (Friedman, Mann-Whitney, Kruskal-Wallis) |
+| **coin** | Required for Mann-Whitney effect sizes (rank-biserial r) |
+| DescTools | Descriptive statistics (Skew, Kurt) |
+| knitr | Document rendering |
+| rmarkdown | Quarto support |
+| janitor | Data cleaning utilities |
+| here | Project-relative paths |
+| FSA | Post-hoc tests |
+| PMCMRplus | Multiple comparisons |
+| gmodels | CrossTable and modeling |
+| usethis | Project setup utilities |
 
-**Now:** 11 core packages + dependencies (~160 total packages)
+## Quick Start
 
-### Core Packages Installed
+```r
+# 1. Open project (renv activates automatically)
+# 2. Restore packages if needed
+renv::restore()
 
-1. **tidyverse** - Data manipulation (dplyr, ggplot2, tidyr, readr, stringr, purrr, etc.)
-2. **rstatix** - Statistical tests (Friedman, Mann-Whitney, Kruskal-Wallis)
-3. **knitr** - Document rendering
-4. **rmarkdown** - R Markdown/Quarto support
-5. **FSA** - Fisheries statistics and post-hoc tests
-6. **PMCMRplus** - Post-hoc multiple comparisons
-7. **janitor** - Data cleaning utilities
-8. **DescTools** - Descriptive statistics (Skew, Kurt, etc.)
-9. **here** - Project-relative paths
-10. **gmodels** - CrossTable and modeling
-11. **usethis** - Project setup utilities
+# 3. Run the unified analysis
+source("render_unified_analysis.R")
+```
 
-All dependencies were automatically installed as binaries (no compilation required).
+## How renv Works
 
-## How to Use
+### Automatic Activation
 
-### Starting R/Positron
+When you open the project in RStudio/Positron, renv **automatically activates** via `.Rprofile`:
 
-When you open the project, renv will **automatically activate**. You'll see:
 ```
 Project loaded: renv 1.1.5
 ```
 
 ### Running Your Analysis
 
-Just open and render your `.qmd` or `.Rmd` files as normal:
-
 ```r
-# In Positron/RStudio
-# Open: scripts/analysis/subfactor_analysis.qmd
-# Click: Render button
+# Option 1: Use the render script (recommended)
+source("render_unified_analysis.R")
+
+# Option 2: Render directly
+quarto::quarto_render("scripts/analysis/unified_retention_analysis.qmd")
 ```
 
-Or use the render script:
-```r
-source("render_subfactor_analysis.R")
-```
+## Package Management
 
-### Package Management
+### Installing New Packages
 
-**Installing new packages:**
 ```r
-install.packages("package_name")
+renv::install("package_name")
 renv::snapshot()  # Save to lockfile
 ```
 
-**Updating packages:**
+### Updating Packages
+
 ```r
-renv::update("package_name")  # Or update all with renv::update()
+renv::update("package_name")  # Update specific package
+renv::update()                # Update all packages
+renv::snapshot()              # Save changes
 ```
 
-**Checking status:**
+### Checking Status
+
 ```r
 renv::status()  # See if project is in sync
 ```
 
-**Restoring packages (on another computer):**
+### Restoring Packages (New Computer)
+
 ```r
 renv::restore()  # Install all packages from lockfile
 ```
 
-## Benefits of This Setup
+## Critical: coin Package
 
-✅ **Reproducible** - Anyone can clone your repo and run `renv::restore()` to get exact package versions
+The `coin` package is **required** for computing Mann-Whitney U effect sizes. Without it, effect sizes will show as `NA`.
 
-✅ **Isolated** - Project packages don't conflict with your system R libraries
+**Verify coin is installed:**
+```r
+library(coin)  # Should load without error
+```
 
-✅ **Fast** - Uses binary packages (no compilation)
-
-✅ **Clean** - Only packages you actually use
-
-✅ **Version controlled** - `renv.lock` tracks exact package versions
+**If missing:**
+```r
+renv::install("coin")
+renv::snapshot()
+```
 
 ## Files in This Setup
 
-- `renv.lock` - Lockfile with all package versions (commit to git)
-- `renv/` - Package library (don't commit to git, in .gitignore)
-- `.Rprofile` - Auto-activates renv when R starts
-- `renv/activate.R` - renv activation script
+| File | Purpose | Git? |
+|------|---------|------|
+| `renv.lock` | Package versions | Yes (commit) |
+| `renv/` | Package library | No (.gitignore) |
+| `.Rprofile` | Auto-activation | Yes (commit) |
+| `rebuild_renv.R` | Rebuild utility | Yes (commit) |
 
 ## Troubleshooting
 
-**If renv doesn't activate:**
+### renv doesn't activate
+
 ```r
 renv::activate()
 ```
 
-**If packages are out of sync:**
+### Packages are out of sync
+
 ```r
-renv::restore()  # Install missing packages
+renv::status()    # Check what's different
+renv::restore()   # Install missing packages
 # OR
 renv::snapshot()  # Update lockfile with current packages
 ```
 
-**To disable renv temporarily:**
+### Effect sizes showing NA
+
+The `coin` package is missing:
+```r
+renv::install("coin")
+renv::snapshot()
+# Restart R and re-render
+```
+
+### Complete rebuild
+
+If renv is corrupted, run:
+```r
+source("rebuild_renv.R")
+```
+
+### Disable renv temporarily
+
 ```r
 renv::deactivate()
 ```
 
-**To completely remove renv:**
-1. Delete `renv/` folder
-2. Delete `.Rprofile`
-3. Delete `renv.lock`
+## Benefits
 
-## Next Steps
-
-You're all set! Just:
-
-1. **Restart Positron/RStudio** (to ensure clean renv activation)
-2. **Run your analysis**: Open and render `subfactor_analysis.qmd`
-3. **Commit the lockfile**: `git add renv.lock && git commit -m "Add clean renv setup"`
+- **Reproducible** - Clone repo, run `renv::restore()`, get exact versions
+- **Isolated** - Project packages don't conflict with system R
+- **Fast** - Uses binary packages (no compilation)
+- **Clean** - Only packages you actually use
+- **Version controlled** - `renv.lock` tracks exact versions
 
 ---
 
-**Created:** November 9, 2025
+**Last Updated:** November 21, 2025
 **renv version:** 1.1.5
-**R version:** 4.5.2
-**Core packages:** 11
-**Total packages (with dependencies):** 161
+**R version:** 4.5.1+
+**Status:** In sync

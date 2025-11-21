@@ -4,124 +4,176 @@
 
 Statistical analysis of factors influencing pilot retention at U.S. airlines, focusing on demographic differences in retention priorities using non-parametric methods.
 
-## Recent Updates
+## Quick Start
 
-**Type I Error Correction Update (November 2025):** Both analyses updated to use appropriate multiple testing corrections for exploratory pilot research:
-- **Subfactor Analysis:** Implemented hierarchical FDR with two-step procedure (Benjamini-Hochberg screening at construct level q=0.10, then Holm within significant constructs α=0.05)
-- **Retention Analysis:** Applied Benjamini-Hochberg FDR at q=0.10 for all demographic comparisons (30 tests), replacing overly conservative Bonferroni correction
-- Friedman post-hoc tests use Holm's procedure (appropriate for dependent within-subjects comparisons)
-- Gender comparisons use exact tests due to small sample (n=8), requiring coin package
-- All statistical tables now report both raw and adjusted p-values
-- Comprehensive statistical methods sections added to both analyses with rationale and references
+```r
+# 1. Open project in RStudio/Positron
+# 2. Restore R environment
+renv::restore()
 
-**Phase 1A: Subfactor Analysis Complete (November 2025):** Comprehensive analysis of 31 subfactor rankings across all six retention constructs completed with the following findings: - Analyzed all subfactors (Financial, QoL, Professional, Recognition, Schedule, Operational) - Compared rankings across 5 demographic groups (age, gender, position, military experience, experience quartiles) - Applied **hierarchical false discovery rate (FDR) control**: two-step procedure with Benjamini-Hochberg screening at construct level (q=0.10), then Holm's procedure within significant constructs (α=0.05) - **Effect sizes** included for all comparisons (rank-biserial r for Mann-Whitney, eta-squared for Kruskal-Wallis) - All CSV tables include both raw p-values and FDR-adjusted p-values - All outputs use readable labels from survey instrument - **Outputs:** 42 CSV tables + 6 median rank visualizations automatically generated - New analysis file: `scripts/analysis/subfactor_analysis.qmd`
+# 3. Render the unified analysis
+source("render_unified_analysis.R")
+```
 
-**Transition to Positron IDE & Quarto:** The project has migrated from RStudio/.Rmd to Positron/.qmd workflow. Recent experimental work focused on: - Converting article manuscript to Quarto format with APA7 styling (apaquarto) - Refining table formatting and professional column labels - Adding complete manuscript sections (Abstract, Introduction, Method, Results) - Creating automated render scripts for consistent output generation
+This generates HTML and DOCX reports in `output/reports/`.
 
-The `.qmd` files now serve as the primary analysis documents, while `.Rmd` files are archived.
+## Project Entry Points
+
+| File | Purpose |
+|------|---------|
+| `render_unified_analysis.R` | Main render script (start here) |
+| `rebuild_renv.R` | Utility to rebuild R environment |
+
+## Analysis Document
+
+**`scripts/analysis/unified_retention_analysis.qmd`** - The single unified analysis combining:
+
+- **Part 1: General Retention Factors** - Rankings of 6 broad constructs with demographic comparisons
+- **Part 2: Subfactor Analysis** - 31 subfactors within constructs with hierarchical FDR control
+
+### Statistical Methods
+
+- **Non-parametric tests**: Friedman, Mann-Whitney U, Kruskal-Wallis
+- **Multiple testing correction**:
+  - General factors: Benjamini-Hochberg FDR at q=0.10
+  - Subfactors: Hierarchical FDR (BH screening + Holm within constructs)
+- **Effect sizes**: Rank-biserial r, eta-squared
 
 ## Directory Structure
 
-```         
-.
-├── data/
-│   ├── raw/                    # Original survey data (untouched)
-│   └── processed/              # Cleaned, analysis-ready data
-├── scripts/
-│   ├── analysis/               # Quarto (.qmd) and R Markdown (.Rmd) analysis files
-│   └── functions/              # Reusable R functions
-├── output/
-│   ├── figures/                # Generated plots and visualizations
-│   ├── tables/                 # Generated statistical tables
-│   └── reports/                # Rendered reports (.html, .pdf, .docx)
-├── documentation/              # Codebooks, data dictionaries, methodology notes
-├── archive/                    # Archived files and old versions
-└── tmp/                        # Temporary files (gitignored)
 ```
-
-## Key Files
-
-### Analysis Scripts
-
--   **`scripts/analysis/subfactor_analysis.qmd`** - Phase 1A subfactor analysis (31 subfactors × 5 demographics)
--   **`scripts/analysis/retention.qmd`** - Full comprehensive analysis (all demographic variables)
--   **`render_subfactor_analysis.R`** - Automated render script for subfactor analysis
--   **`scripts/analysis/retention.Rmd`** - Full comprehensive analysis (R Markdown - archived)
-
-### Data Files
-
--   **`data/processed/retention.csv`** - Primary working dataset
--   **`data/processed/retention_cleaned.csv`** - Cleaned dataset output from analysis
--   **`data/raw/US_Pilot_Retention_Survey_May_14_2025.csv`** - Original survey export
-
-### Documentation
-
--   **`documentation/subfactor_analysis_plan.md`** - Detailed plan and progress for Phase 1A subfactor analysis
--   **`scripts/analysis/SUBFACTOR_README.md`** - Usage guide for subfactor analysis
+.
+├── scripts/analysis/
+│   └── unified_retention_analysis.qmd   # Main analysis document
+├── data/
+│   ├── raw/                             # Original survey data
+│   └── processed/                       # Cleaned analysis-ready data
+├── output/
+│   ├── reports/                         # Rendered HTML/DOCX reports
+│   ├── tables/                          # CSV statistical tables
+│   └── figures/                         # PNG visualizations
+├── documentation/                       # Design docs, plans
+├── archive/                             # Archived old files
+│   ├── original_qmds/                   # Original separate QMD files
+│   └── old_scripts/                     # Old render scripts
+├── renv/                                # R environment (managed by renv)
+├── render_unified_analysis.R            # Main entry point
+├── rebuild_renv.R                       # renv utility
+└── renv.lock                            # Package lockfile
+```
 
 ## Requirements
 
 **R Version:** 4.5.1 or higher
 
-**Required R Packages:**
-- tidyverse (dplyr, ggplot2, tidyr, readr, stringr)
-- rstatix (Friedman, Mann-Whitney, Kruskal-Wallis tests)
-- **coin** (required for Mann-Whitney effect sizes - see Critical Dependencies below)
-- DescTools (skewness, kurtosis)
-- janitor (data cleaning)
-- here (path management)
-- knitr (reporting)
-- FSA, PMCMRplus (post-hoc tests)
-- gmodels, usethis
+**Critical Package:** The `coin` package is required for effect size calculations.
 
-**Quarto Extensions:**
-- [apaquarto](https://wjschne.github.io/apaquarto/) - APA-formatted manuscripts (7th edition)
-
-### Critical Dependencies
-
-⚠️ **IMPORTANT: coin Package Required for Effect Sizes**
-
-The `coin` package is **required** for computing Mann-Whitney U effect sizes (rank-biserial r) in the subfactor analysis. Without it, all Mann-Whitney effect sizes will silently fail and show as `NA` in outputs.
-
-**Setup:**
 ```r
-# Install all packages from renv.lock (includes coin)
+# Install all packages from lockfile
 renv::restore()
 
-# If renv::restore() fails, manually install coin:
+# Or manually install coin if needed
 renv::install("coin")
 ```
 
-**Verification:**
-After running the subfactor analysis, check that effect sizes are populated:
-- Open `output/tables/subfactor_analysis/financial_age.csv`
-- Verify the `effsize` column shows numeric values (not `NA`)
-- If all values are `NA`, run `renv::install("coin")` and re-render
+## Output Files
 
-## Quick Start
+After running `render_unified_analysis.R`:
 
-### Run Subfactor Analysis (Phase 1A)
+| Location | Contents |
+|----------|----------|
+| `output/reports/` | HTML and DOCX rendered reports |
+| `output/tables/subfactor_analysis/` | 43 CSV files (descriptive stats, tests) |
+| `output/tables/unified_analysis/` | 2 CSV files (summary tables) |
+| `output/figures/subfactor_analysis/` | 6 PNG figures (median rank charts) |
 
-``` r
-source("render_subfactor_analysis.R")
+## Verification
+
+After rendering, verify output completeness:
+
+```r
+# Check CSV counts
+length(list.files("output/tables/subfactor_analysis", pattern = "\\.csv$"))
+# Expected: 43
+
+# Check PNG counts
+length(list.files("output/figures/subfactor_analysis", pattern = "\\.png$"))
+# Expected: 6
 ```
 
-This generates HTML and DOCX reports analyzing all 31 subfactors across demographics.
+## Sample
 
-### Run Other Analyses
+- **Total n:** 76 U.S. airline pilots
+- **Demographic comparisons:** Age, gender, position, military background, experience
+- **Note:** Limited power for some comparisons (especially gender: 8 females)
 
-1.  Open the R project in Positron or RStudio
-2.  Install required packages (see Requirements section)
-3.  Install Quarto extensions: `quarto add wjschne/apaquarto`
-4.  Open `scripts/analysis/retention.qmd` or `scripts/analysis/ret_age_gender_art.qmd`
-5.  Click "Render" (Quarto) to run the analysis
+## Documentation
 
-## Data
+| Document | Description |
+|----------|-------------|
+| [LICENSE.md](LICENSE.md) | CC BY-NC 4.0 license terms |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Fork/clone guidelines, PR requirements, code standards |
+| [RENV_SETUP.md](RENV_SETUP.md) | R environment setup and troubleshooting |
+| [documentation/refactor_combine_design.md](documentation/refactor_combine_design.md) | Software design document |
+| [documentation/refactor_combine_project_plan.md](documentation/refactor_combine_project_plan.md) | Implementation plan |
+| [documentation/function_architecture.md](documentation/function_architecture.md) | Helper function specifications |
 
--   **Input data:** Located in `data/processed/retention.csv`
--   **Raw survey data:** Available in `data/raw/` (for reference only)
--   **Cleaned output:** Generated to `data/processed/retention_cleaned.csv` when analysis runs
+## Version History
 
-## Output
+- **November 2025:** Unified analysis created, combining retention.qmd and subfactor_analysis.qmd
+- Original files archived in `archive/original_qmds/`
 
-Analysis outputs are generated to: - **Reports:** `output/reports/` (.docx and .html files from rendered .qmd) - **Figures:** `output/figures/` (plots and visualizations) - **Tables:** `output/tables/` (statistical tables)
+## License
+
+This repository is licensed under the **Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)**.
+
+See [LICENSE.md](LICENSE.md) for full details.
+
+### Summary
+
+- **Non-commercial use only** - You may use, copy, adapt, and share for academic research, teaching, and personal study
+- **Attribution required** - Credit must be given to the authors
+- **Modifications allowed** - You may adapt the work, but must indicate changes and retain attribution
+- **Commercial use requires permission** - Contact michael.j.hickey@und.edu for commercial licensing inquiries
+
+### Research Team
+
+| Author | Institution |
+|--------|-------------|
+| Michael J. Hickey (Lead, Corresponding) | University of North Dakota |
+| Marina Efthymiou | Dublin City University |
+| James Higgins | University of North Dakota |
+| Aman Gupta | Embry-Riddle Aeronautical University |
+| Robert Walton | Embry-Riddle Aeronautical University |
+
+### Data Notice
+
+Survey response data in `data/` may be subject to additional restrictions beyond the CC BY-NC 4.0 license. Contact the corresponding author before redistributing raw data.
+
+### Citation
+
+**Repository:**
+> Hickey, M. J., Efthymiou, M., Higgins, J., Gupta, A., & Walton, R. (2025). *U.S. Airline Pilot Retention Analysis* [Code repository]. GitHub. https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis
+
+**Thesis:**
+> Hickey, M. J. (2025). *Rethinking Pilot Retention in the United States: An Analysis of Key Factors* [Doctoral dissertation, University of North Dakota]. ProQuest Dissertations & Theses. https://www.proquest.com/docview/3246414757
+
+**BibTeX:**
+```bibtex
+@misc{hickey2025retention_repo,
+  author = {Hickey, Michael J. and Efthymiou, Marina and Higgins, James and Gupta, Aman and Walton, Robert},
+  title = {U.S. Airline Pilot Retention Analysis},
+  year = {2025},
+  publisher = {GitHub},
+  url = {https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis}
+}
+
+@phdthesis{hickey2025retention_thesis,
+  author = {Hickey, Michael J.},
+  title = {Rethinking Pilot Retention in the United States: An Analysis of Key Factors},
+  school = {University of North Dakota},
+  year = {2025},
+  note = {ProQuest ID: 3246414757},
+  url = {https://www.proquest.com/docview/3246414757}
+}
+```

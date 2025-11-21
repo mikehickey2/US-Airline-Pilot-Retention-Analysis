@@ -1,6 +1,6 @@
 item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
 Financially stable airline,593.5,0.348,1,ns,0.10865384615384613,small
-Rapid upgrade opportunity,696.5,0.603,1,ns,0.06037881669327927,small
-Fly larger aircraft,679.5,0.743,1,ns,0.03825149928541394,small
-Merit-based promotion,645,0.96,1,ns,0.006468570535032198,small
-Seniority-based upgrade,578,0.414,1,ns,0.09433159890895582,small
+Opportunity for rapid upgrade,696.5,0.603,1,ns,0.06037881669327927,small
+Opportunity to fly larger aircraft,679.5,0.743,1,ns,0.03825149928541394,small
+Promotion/upgrade based on merit,645,0.96,1,ns,0.006468570535032198,small
+Upgrade based on length of service,578,0.414,1,ns,0.09433159890895582,small
