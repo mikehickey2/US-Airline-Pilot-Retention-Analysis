@@ -1,0 +1,42 @@
+# R Project Files
+.Rhistory
+.RData
+.Rproj.user
+
+# Temporary files
+tmp/
+*.tmp
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# RStudio
+.Rproj.user/
+
+# renv - ignore library but track lockfile
+renv/library/
+renv/local/
+renv/staging/
+
+# Output (uncomment if not tracking output)
+# output/
+
+# Sensitive data (adjust as needed)
+# data/raw/*.csv
+# data/raw/*.xlsx
+# !data/raw/.gitkeep
+
+/.quarto/
+**/*.quarto_ipynb
+
+# Quarto freeze cache (rendered outputs tracked in output/)
+_freeze/
+
+# Archive directory (old code/scripts; documentation preserved in documentation/project_history/)
+archive/
+
+# Claude Code settings (local agent configurations)
+.claude/

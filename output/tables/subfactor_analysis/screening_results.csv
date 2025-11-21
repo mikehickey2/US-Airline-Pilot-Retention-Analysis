@@ -1,0 +1,7 @@
+construct,n_subfactors,min_p,rank,p_adj_fdr,passes_screen,decision
+Quality of Life,6,0.0147,1,0.0588,TRUE,Proceed to detailed testing
+Recognition,4,0.0196,2,0.0588,TRUE,Proceed to detailed testing
+Schedule,5,0.0359,3,0.0718,TRUE,Proceed to detailed testing
+Professional,5,0.0493,4,0.07394999999999999,TRUE,Proceed to detailed testing
+Financial,6,0.0691,5,0.08292,TRUE,Proceed to detailed testing
+Operational,5,0.145,6,0.145,FALSE,No demographic differences detected
