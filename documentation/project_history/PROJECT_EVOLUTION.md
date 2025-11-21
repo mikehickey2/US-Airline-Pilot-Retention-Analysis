@@ -78,6 +78,23 @@ Major refactoring to consolidate two separate QMD files into a single unified an
 - 6 PNG median rank figures
 - HTML and DOCX rendered reports
 
+### Phase 4: GitHub Pages Deployment (Nov 21, 2025)
+
+**Branch:** `main` (direct deployment)
+
+Published the unified analysis to GitHub Pages for public access.
+
+**Live Site:** [https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/](https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/)
+
+**Deployment Method:**
+- Quarto's built-in `quarto publish gh-pages` command
+- Renders locally, pushes only HTML output to `gh-pages` branch
+- Manual deployment (not CI/CD) - avoids complex R environment setup in GitHub Actions
+
+**Key Configuration:**
+- Added `_site/` to `.gitignore` (Quarto's temp build directory)
+- `gh-pages` branch auto-managed by Quarto (contains only rendered HTML)
+
 ---
 
 ## Branch Merge History
@@ -121,5 +138,12 @@ As of November 21, 2025:
 - **Entry Point:** `render_unified_analysis.R`
 - **Package Management:** `renv.lock` with `coin` dependency
 - **License:** CC BY-NC 4.0
+- **Live Site:** [https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/](https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/)
+
+**Active Branches:**
+| Branch | Purpose |
+|--------|---------|
+| `main` | Development and publishing source |
+| `gh-pages` | Rendered HTML (auto-managed by Quarto) |
 
 See [README.md](../../README.md) for usage instructions.

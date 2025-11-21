@@ -4,6 +4,8 @@
 
 Statistical analysis of factors influencing pilot retention at U.S. airlines, focusing on demographic differences in retention priorities using non-parametric methods.
 
+**View the analysis online:** [https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/](https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/)
+
 ## Repository Origins
 
 This repository was created on **November 7, 2025** by cloning the original thesis repository:
@@ -117,6 +119,21 @@ length(list.files("output/figures/subfactor_analysis", pattern = "\\.png$"))
 - **Demographic comparisons:** Age, gender, position, military background, experience
 - **Note:** Limited power for some comparisons (especially gender: 8 females)
 
+## Web Deployment
+
+The analysis is published to GitHub Pages via Quarto's built-in publishing workflow.
+
+**Live site:** [https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/](https://mikehickey2.github.io/US-Airline-Pilot-Retention-Analysis/)
+
+**To update the site after making changes:**
+```bash
+quarto publish gh-pages scripts/analysis/unified_retention_analysis.qmd
+```
+
+This renders the QMD locally and pushes only the HTML output to the `gh-pages` branch. GitHub Pages automatically serves the updated content.
+
+*Note: This is manual deployment, not CI/CD. The R environment with all dependencies runs locally, avoiding complex GitHub Actions configuration.*
+
 ## Documentation
 
 | Document | Description |
@@ -135,6 +152,7 @@ length(list.files("output/figures/subfactor_analysis", pattern = "\\.png$"))
 | Nov 8, 2025 | Subfactor analysis branch: 31 subfactors within 6 constructs |
 | Nov 19, 2025 | Type I error control: Hierarchical FDR implementation |
 | Nov 21, 2025 | Refactor & combine: Unified analysis document created |
+| Nov 21, 2025 | GitHub Pages deployment: Analysis published online |
 
 See [PROJECT_EVOLUTION.md](documentation/project_history/PROJECT_EVOLUTION.md) for detailed development history.
 
