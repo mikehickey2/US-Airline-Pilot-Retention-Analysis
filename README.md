@@ -4,6 +4,14 @@
 
 Statistical analysis of factors influencing pilot retention at U.S. airlines, focusing on demographic differences in retention priorities using non-parametric methods.
 
+## Repository Origins
+
+This repository was created on **November 7, 2025** by cloning the original thesis repository:
+
+**Source:** [MS-Thesis-US-Airline-Pilot-Retention](https://github.com/mikehickey2/MS-Thesis-US-Airline-Pilot-Retention)
+
+The thesis repository contains the complete doctoral dissertation work. This repository extracts and extends the retention factor analysis for peer-reviewed journal publication.
+
 ## Quick Start
 
 ```r
@@ -52,15 +60,17 @@ This generates HTML and DOCX reports in `output/reports/`.
 │   ├── reports/                         # Rendered HTML/DOCX reports
 │   ├── tables/                          # CSV statistical tables
 │   └── figures/                         # PNG visualizations
-├── documentation/                       # Design docs, plans
-├── archive/                             # Archived old files
-│   ├── original_qmds/                   # Original separate QMD files
-│   └── old_scripts/                     # Old render scripts
+├── documentation/
+│   ├── project_history/                 # Development evolution docs
+│   │   └── PROJECT_EVOLUTION.md         # Master timeline index
+│   └── function_architecture.md         # Helper function specs
 ├── renv/                                # R environment (managed by renv)
 ├── render_unified_analysis.R            # Main entry point
 ├── rebuild_renv.R                       # renv utility
 └── renv.lock                            # Package lockfile
 ```
+
+*Note: `archive/` and `_freeze/` directories exist locally but are gitignored.*
 
 ## Requirements
 
@@ -114,14 +124,19 @@ length(list.files("output/figures/subfactor_analysis", pattern = "\\.png$"))
 | [LICENSE.md](LICENSE.md) | CC BY-NC 4.0 license terms |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Fork/clone guidelines, PR requirements, code standards |
 | [RENV_SETUP.md](RENV_SETUP.md) | R environment setup and troubleshooting |
-| [documentation/refactor_combine_design.md](documentation/refactor_combine_design.md) | Software design document |
-| [documentation/refactor_combine_project_plan.md](documentation/refactor_combine_project_plan.md) | Implementation plan |
 | [documentation/function_architecture.md](documentation/function_architecture.md) | Helper function specifications |
+| [documentation/project_history/PROJECT_EVOLUTION.md](documentation/project_history/PROJECT_EVOLUTION.md) | Development timeline and branch history |
 
 ## Version History
 
-- **November 2025:** Unified analysis created, combining retention.qmd and subfactor_analysis.qmd
-- Original files archived in `archive/original_qmds/`
+| Date | Milestone |
+|------|-----------|
+| Nov 7, 2025 | Repository created (cloned from [thesis repo](https://github.com/mikehickey2/MS-Thesis-US-Airline-Pilot-Retention)) |
+| Nov 8, 2025 | Subfactor analysis branch: 31 subfactors within 6 constructs |
+| Nov 19, 2025 | Type I error control: Hierarchical FDR implementation |
+| Nov 21, 2025 | Refactor & combine: Unified analysis document created |
+
+See [PROJECT_EVOLUTION.md](documentation/project_history/PROJECT_EVOLUTION.md) for detailed development history.
 
 ## License
 

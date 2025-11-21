@@ -32,5 +32,11 @@ renv/staging/
 /.quarto/
 **/*.quarto_ipynb
 
+# Quarto freeze cache (rendered outputs tracked in output/)
+_freeze/
+
+# Archive directory (old code/scripts; documentation preserved in documentation/project_history/)
+archive/
+
 # Claude Code settings (local agent configurations)
 .claude/
