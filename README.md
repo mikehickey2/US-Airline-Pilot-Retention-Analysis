@@ -12,7 +12,7 @@ This repository was created on **November 7, 2025** by cloning the original thes
 
 **Source:** [MS-Thesis-US-Airline-Pilot-Retention](https://github.com/mikehickey2/MS-Thesis-US-Airline-Pilot-Retention)
 
-The thesis repository contains the complete doctoral dissertation work. This repository extracts and extends the retention factor analysis for peer-reviewed journal publication.
+The thesis repository contains the complete master's thesis work. This repository extracts and extends the retention factor analysis for peer-reviewed journal publication.
 
 ## Quick Start
 
@@ -189,7 +189,7 @@ Survey response data in `data/` may be subject to additional restrictions beyond
 > Hickey, M. J., Efthymiou, M., Higgins, J., Gupta, A., & Walton, R. (2025). *U.S. Airline Pilot Retention Analysis* [Code repository]. GitHub. https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis
 
 **Thesis:**
-> Hickey, M. J. (2025). *Rethinking Pilot Retention in the United States: An Analysis of Key Factors* [Doctoral dissertation, University of North Dakota]. ProQuest Dissertations & Theses. https://www.proquest.com/docview/3246414757
+> Hickey, M. J. (2025). *Rethinking Pilot Retention in the United States: An Analysis of Key Factors* [Master's thesis, University of North Dakota]. ProQuest Dissertations & Theses. https://www.proquest.com/docview/3246414757
 
 **BibTeX:**
 ```bibtex
