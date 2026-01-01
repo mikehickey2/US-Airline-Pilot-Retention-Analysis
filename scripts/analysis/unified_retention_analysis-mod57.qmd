@@ -67,7 +67,7 @@ All ranking data is ordinal; therefore, non-parametric tests are used throughout
 
 This quantitative study employs a **hierarchical false discovery rate (FDR) control procedure**:
 
-**General Factor Analysis (30 tests):** Benjamini-Hochberg FDR at q = 0.10 applied across all demographic comparisons.
+**General Factor Analysis (24 tests):** Benjamini-Hochberg FDR at q = 0.10 applied across all demographic comparisons (6 factors x 4 demographics; carrier type excluded in regional-only analysis).
 
 **Subfactor Analysis (155 tests):** Two-step hierarchical procedure:
 
@@ -357,6 +357,9 @@ This section analyzes the rankings of six broad retention constructs:
 
 ```{r}
 #| label: rq1-descriptives
+#| fig-cap: "Distribution of top-ranked retention factors among regional airline pilots"
+#| fig-alt: "Bar chart showing the number of pilots ranking each of six retention factors as most important"
+
 # Build long-format data for general factors
 general_long <- included_data %>%
   select(respondent_id, all_of(rank_cols)) %>%
@@ -598,7 +601,7 @@ if (all(c("Male", "Female") %in% names(gender_counts)) &&
 ```
 
 ::: {.callout-note}
-**Note on Gender Comparisons:** With only 8 female respondents, statistical power for detecting gender differences is limited. Results should be interpreted cautiously.
+**Note on Gender Comparisons:** With only 5 female respondents in this regional subset, statistical power for detecting gender differences is severely limited. Results should be interpreted with extreme caution.
 :::
 
 ### Military Background
@@ -782,26 +785,26 @@ empty_demo <- function(label) {
   )
 }
 
-# Build summary table
+# Build summary table (carrier type excluded - all pilots are regional)
 retention_summary <- bind_rows(
   calc_summary(mw_age, "Age (<=35 vs >35)"),
   calc_summary(kw_exp, "Experience Quartiles"),
-  if (exists("mw_gender")) {
+  if (exists("mw_gender") && nrow(mw_gender) > 0) {
     calc_summary(mw_gender, "Gender (Male vs Female)")
   } else {
     empty_demo("Gender")
   },
-  if (exists("mw_mil")) {
+  if (exists("mw_mil") && nrow(mw_mil) > 0) {
     calc_summary(mw_mil, "Military Background")
   } else {
     empty_demo("Military")
   },
-  if (exists("mw_pos")) {
+  if (exists("mw_pos") && nrow(mw_pos) > 0) {
     calc_summary(mw_pos, "Flight-Deck Position")
   } else {
     empty_demo("Position")
-  },
-  calc_summary(kw_carrier, "Carrier Type")
+  }
+  # NOTE: Carrier type excluded - all 57 pilots are regional airline employees
 )
 
 kable(retention_summary, digits = 4,
@@ -943,6 +946,9 @@ constructs_config <- list(
 
 ```{r}
 #| label: analyze-financial
+#| fig-cap: "Median ranks for Financial subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for six financial retention subfactors"
+
 results_financial <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$financial$name,
@@ -975,6 +981,9 @@ kable(results_financial$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-qol
+#| fig-cap: "Median ranks for Quality of Life subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for six quality of life retention subfactors"
+
 results_qol <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$qol$name,
@@ -1007,6 +1016,9 @@ kable(results_qol$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-professional
+#| fig-cap: "Median ranks for Professional Opportunity subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for five professional opportunity subfactors"
+
 results_professional <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$professional$name,
@@ -1039,6 +1051,9 @@ kable(results_professional$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-recognition
+#| fig-cap: "Median ranks for Recognition subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for four recognition retention subfactors"
+
 results_recognition <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$recognition$name,
@@ -1071,6 +1086,9 @@ kable(results_recognition$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-schedule
+#| fig-cap: "Median ranks for Schedule subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for five schedule retention subfactors"
+
 results_schedule <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$schedule$name,
@@ -1103,6 +1121,9 @@ kable(results_schedule$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-operational
+#| fig-cap: "Median ranks for Operational subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for five operational retention subfactors"
+
 results_operational <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$operational$name,
@@ -1200,7 +1221,7 @@ combined_summary <- tibble(
   FDR_Method = c("BH q=0.10", "Hierarchical: BH screening + Holm within"),
   Significant_FDR = c(general_sig_fdr, subfactor_constructs_screened),
   Note = c(
-    "6 factors × 5 demographics (no Position analysis)",
+    "6 factors x 4 demographics (carrier type excluded)",
     paste0(subfactor_constructs_screened, " of 6 constructs pass screening")
   )
 )
@@ -1254,17 +1275,18 @@ This analysis has several important limitations:
 ## Sample Size and Power
 
 The regional-only sample of n = 57 provides adequate power only for detecting large effects. For demographic comparisons:
-| Comparison | Approximate Group Sizes | Detectable Effect (80% power) |
-|------------|------------------------|-------------------------------|
-| Age groups | ~43 vs ~14 | Large (r > 0.45) |
+
+| Comparison | Group Sizes | Detectable Effect (80% power) |
+|------------|-------------|-------------------------------|
+| Age groups | 47 vs 10 | Large (r > 0.50) |
 | Experience | ~14 per quartile | Very large (eta-squared > 0.14) |
-| Gender | ~52 vs ~5 | Very large only (r > 0.7) |
-| Military | ~25 vs ~32 | Medium-large (r approx 0.40) |
-| Position | ~33 vs ~24 | Medium-large (r approx 0.40) |
+| Gender | 51 vs 5 | Very large only (r > 0.70) |
+| Military | 53 vs 4 | Very large only (r > 0.70) |
+| Position | 36 vs 21 | Medium-large (r > 0.40) |
 
-**Note**: Group sizes are approximate and computed from the regional subset. The reduction from n=76 to n=57 further limits statistical power, particularly for already-small subgroups.
+**Note**: The reduction from n=76 to n=57 further limits statistical power, particularly for already-small subgroups.
 
-**Gender comparisons warrant particular caution**: With approximately 5 female respondents in the regional subset, the analysis has very low power to detect even large effects - most true gender differences would go undetected.
+**Gender and Military comparisons warrant particular caution**: With only 5 female and 4 military-background respondents in the regional subset, these analyses have very low power to detect even large effects.
 
 ## Additional Limitations
 

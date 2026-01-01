@@ -1,3 +1,3 @@
 Analysis,Total_Tests,FDR_Method,Significant_FDR,Note
-General Factors,24,BH q=0.10,2,6 factors × 5 demographics (no Position analysis)
+General Factors,24,BH q=0.10,2,6 factors x 4 demographics (carrier type excluded)
 Subfactor Analysis,155,Hierarchical: BH screening + Holm within,5,5 of 6 constructs pass screening
