@@ -1,0 +1,5 @@
+item,statistic,df,p,p_adj_holm,p.adj.signif,effsize,magnitude
+Professional-looking uniforms,2.601854108956571,3,0.457,1,ns,-0.007512186623460921,small
+Additional vacation for long service,5.950362100537537,3,0.114,0.456,ns,0.055667209444104464,small
+Recognition as a professional,3.0949730119643135,3,0.377,1,ns,0.0017919436219681795,small
+Airline recognition,0.8139688276485042,3,0.846,1,ns,-0.041245871176443315,small

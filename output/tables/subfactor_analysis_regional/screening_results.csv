@@ -1,0 +1,7 @@
+construct,n_subfactors,min_p,rank,p_adj_fdr,passes_screen,decision
+Financial,6,0.0122,1,0.02928,TRUE,Proceed to detailed testing
+Recognition,4,0.0136,2,0.02928,TRUE,Proceed to detailed testing
+Professional,5,0.0215,3,0.02928,TRUE,Proceed to detailed testing
+Operational,5,0.0231,4,0.02928,TRUE,Proceed to detailed testing
+Quality of Life,6,0.0244,5,0.02928,TRUE,Proceed to detailed testing
+Schedule,5,0.283,6,0.283,FALSE,No demographic differences detected

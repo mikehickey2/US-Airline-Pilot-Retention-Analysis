@@ -1,0 +1,6 @@
+item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
+Fixed schedule,412.5,0.561,1,ns,0.0781838191874836,small
+Variable schedule,379,0.993,1,ns,0.0022779545634032923,small
+Flexible work rules,324,0.35,1,ns,0.12489388888481576,small
+Bid line seniority system,426.5,0.414,1,ns,0.1093697571447303,small
+Vacation bidding rules,332,0.433,1,ns,0.10494961931890097,small

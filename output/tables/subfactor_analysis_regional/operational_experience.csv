@@ -1,0 +1,6 @@
+item,statistic,df,p,p_adj_holm,p.adj.signif,effsize,magnitude
+Unambiguous SOPs,9.523856647081068,3,0.0231,0.11549999999999999,ns,0.12309163485058619,moderate
+Proactive training environment,2.5679634449650015,3,0.463,1,ns,-0.008151633113867896,small
+Well-maintained aircraft,2.298202522115537,3,0.513,1,ns,-0.013241461846876662,small
+Well-equipped aircraft,8.314244746858513,3,0.0399,0.1596,ns,0.1002687688086512,moderate
+Highly skilled fellow pilots,3.0308373645840323,3,0.387,1,ns,5.818370676232509e-4,small

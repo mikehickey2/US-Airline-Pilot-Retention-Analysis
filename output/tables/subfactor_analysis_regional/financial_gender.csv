@@ -1,0 +1,7 @@
+item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
+Competitive salary,206,0.0122,0.0732,ns,0.33687236027256867,moderate
+Allowances and soft pay,176,0.155,0.62,ns,0.19180982983301947,small
+Benefits package,90,0.273,0.62,ns,0.1483388439290612,small
+Disability insurance,81.5,0.171,0.62,ns,0.18488255078316118,small
+Job security,62.5,0.042,0.21000000000000002,ns,0.2737917350581443,small
+New hire/longevity bonuses,151.5,0.421,0.62,ns,0.1097644165313325,small

@@ -1,0 +1,7 @@
+item,statistic,p,p_adj_holm,p.adj.signif,effsize,magnitude
+Predictable schedule,436.5,0.32,1,ns,0.13293017257981554,small
+Vacation time,360.5,0.768,1,ns,0.04017069956464487,small
+Family-friendly policies,368.5,0.878,1,ns,0.02150912767569194,small
+Possibility of being based at home,347.5,0.601,1,ns,0.07044913297984706,small
+Travel benefits,316.5,0.291,1,ns,0.1410509649383219,small
+Work-life balance,400,0.711,1,ns,0.050207410800288184,small
