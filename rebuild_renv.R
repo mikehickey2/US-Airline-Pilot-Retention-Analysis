@@ -7,6 +7,7 @@ cat("=== Rebuilding renv with minimal packages ===\n\n")
 required_packages <- c(
   "tidyverse",    # Includes: dplyr, tidyr, ggplot2, readr, stringr, purrr, etc.
   "rstatix",      # Statistical tests
+  "coin",         # Effect size calculations (required for Mann-Whitney)
   "knitr",        # Document rendering
   "rmarkdown",    # Document rendering (needed for .Rmd/.qmd)
   "FSA",          # Post-hoc tests
@@ -15,7 +16,11 @@ required_packages <- c(
   "DescTools",    # Descriptive statistics
   "here",         # Path management
   "gmodels",      # CrossTable and other modeling functions
-  "usethis"       # Project setup utilities
+  "usethis",      # Project setup utilities
+  "checkmate",    # Argument validation
+  "assertr",      # Pipeline validation
+  "lintr",        # Code linting
+  "testthat"      # Unit testing
 )
 
 cat("Required packages for this project:\n")
@@ -26,19 +31,19 @@ cat("\n")
 cat("Step 1: Removing old renv setup...\n")
 if (dir.exists("renv.backup")) {
   unlink("renv.backup", recursive = TRUE)
-  cat("  ✓ Removed renv.backup/\n")
+  cat("  [OK] Removed renv.backup/\n")
 }
 if (file.exists("renv.lock.backup")) {
   file.remove("renv.lock.backup")
-  cat("  ✓ Removed renv.lock.backup\n")
+  cat("  [OK] Removed renv.lock.backup\n")
 }
 if (dir.exists("renv")) {
   unlink("renv", recursive = TRUE)
-  cat("  ✓ Removed renv/\n")
+  cat("  [OK] Removed renv/\n")
 }
 if (file.exists("renv.lock")) {
   file.remove("renv.lock")
-  cat("  ✓ Removed renv.lock\n")
+  cat("  [OK] Removed renv.lock\n")
 }
 
 cat("\nStep 2: Installing renv package...\n")
@@ -55,7 +60,7 @@ install.packages(required_packages, repos = "https://cloud.r-project.org")
 cat("\nStep 5: Creating renv snapshot...\n")
 renv::snapshot(prompt = FALSE)
 
-cat("\n✅ renv rebuild complete!\n\n")
+cat("\n[DONE] renv rebuild complete!\n\n")
 cat("Summary:\n")
 cat("  - Removed bloated old renv with 200+ packages\n")
 cat("  - Created clean renv with", length(required_packages), "core packages\n")
@@ -70,4 +75,4 @@ cat("  3. Run your analysis files as normal\n\n")
 cat("Installed packages:\n")
 installed <- installed.packages()[, "Package"]
 our_packages <- intersect(required_packages, installed)
-cat(paste("  ✓", our_packages), sep = "\n")
+cat(paste("  [OK]", our_packages), sep = "\n")

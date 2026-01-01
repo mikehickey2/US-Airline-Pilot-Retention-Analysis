@@ -1,0 +1,8 @@
+linters: linters_with_defaults(
+  line_length_linter(110),
+  object_name_linter = NULL,
+  cyclocomp_linter(25)
+)
+exclusions: list(
+  "renv" = list(Inf)
+)

@@ -43,3 +43,4 @@ archive/
 
 # Claude Code settings (local agent configurations)
 .claude/
+CLAUDE.md
