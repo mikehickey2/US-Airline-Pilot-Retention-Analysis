@@ -2,9 +2,6 @@
 # Run with: Rscript -e "testthat::test_dir('tests/testthat')"
 
 library(testthat)
-library(dplyr)
-library(tidyr)
-library(tibble)
 library(here)
 
 # Source helper functions
@@ -13,7 +10,7 @@ source(here("R/retention_helpers.R"))
 # Test data fixtures
 create_test_data <- function() {
 
-  tibble(
+  tibble::tibble(
     age_group = c("<=35", "<=35", ">35", ">35", "<=35", ">35"),
     gender_clean = c("Male", "Male", "Female", "Male", "Female", "Male"),
     position = c("Captain", "FO", "Captain", "FO", "Captain", "FO"),
@@ -80,7 +77,7 @@ test_that("compute_descriptives validates inputs", {
   )
 
   expect_error(
-    compute_descriptives(tibble(item = "a", rank = 1), c("wrong")),
+    compute_descriptives(tibble::tibble(item = "a", rank = 1), c("wrong")),
     "Assertion on 'item_labels' failed"
   )
 })
@@ -100,7 +97,7 @@ test_that("run_friedman_test returns valid result", {
 
 # Tests for safe_wilcox_test
 test_that("safe_wilcox_test returns empty tibble for single group", {
-  single_group_data <- tibble(
+  single_group_data <- tibble::tibble(
     rank = c(1, 2, 3),
     group = c("A", "A", "A")
   )
@@ -119,14 +116,14 @@ test_that("safe_wilcox_test validates inputs", {
   )
 
   expect_error(
-    safe_wilcox_test(tibble(rank = 1, group = "A"), "not_a_formula"),
+    safe_wilcox_test(tibble::tibble(rank = 1, group = "A"), "not_a_formula"),
     "Assertion on 'formula' failed"
   )
 })
 
 # Tests for safe_kruskal_test
 test_that("safe_kruskal_test returns empty tibble for single group", {
-  single_group_data <- tibble(
+  single_group_data <- tibble::tibble(
     rank = c(1, 2, 3),
     group = c("A", "A", "A")
   )
@@ -140,7 +137,7 @@ test_that("safe_kruskal_test returns empty tibble for single group", {
 
 # Tests for create_median_rank_chart
 test_that("create_median_rank_chart returns ggplot object", {
-  desc_stats <- tibble(
+  desc_stats <- tibble::tibble(
     item = c("A", "B", "C"),
     median = c(1.5, 2.0, 2.5)
   )
@@ -158,7 +155,7 @@ test_that("create_median_rank_chart validates inputs", {
   )
 
   expect_error(
-    create_median_rank_chart(tibble(item = "A", median = 1), 123),
+    create_median_rank_chart(tibble::tibble(item = "A", median = 1), 123),
     "Assertion on 'construct_name' failed"
   )
 })
@@ -207,10 +204,10 @@ test_that("run_demographic_comparison handles multi-level demographics", {
 test_that("export_construct_tables creates files", {
   skip_if_not(dir.exists(tempdir()))
 
-  desc_stats <- tibble(item = "A", n = 10, median = 2)
-  friedman_result <- tibble(statistic = 5, p = 0.05)
+  desc_stats <- tibble::tibble(item = "A", n = 10, median = 2)
+  friedman_result <- tibble::tibble(statistic = 5, p = 0.05)
   demo_results <- list(
-    age = tibble(item = "A", p = 0.05)
+    age = tibble::tibble(item = "A", p = 0.05)
   )
 
   temp_dir <- tempdir()
