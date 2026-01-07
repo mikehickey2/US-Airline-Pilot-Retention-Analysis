@@ -1,6 +1,6 @@
 ---
-title: "U.S. Regional Airline Pilot Retention Analysis"
-subtitle: "General Factor Rankings and Subfactor Priorities (Regional Carriers Only, n=57)"
+title: "U.S.-based Regional Airline Pilot Retention Analysis"
+subtitle: "General Factor Rankings and Subfactor Priorities (n=57)"
 author:
   - name: Michael J. Hickey
     email: michael.j.hickey@und.edu
@@ -40,20 +40,20 @@ execute:
 
 **Repository:** [GitHub][repo-url]
 
-This analysis examines pilot retention priorities from a survey of U.S. regional airline pilots (n = 57). This regional-only analysis was conducted as a sensitivity analysis to address scope-sample alignment, as regional carriers comprised 75% of the original sample.
+This analysis examines pilot retention priorities from a survey of U.S.-based regional airline pilots (n = 57).
 
 The analysis has two parts:
 
 1.  **General Retention Factors** - Rankings of six broad retention constructs and demographic comparisons
 2.  **Subfactor Analysis** - Within-construct priorities for 31 specific retention elements
 
-![Factors of Pilot Retention in U.S. Airlines](../../documentation/elements_of_retention.png){#fig-retention-factors}
+![Factors of Pilot Retention in U.S.-based Regional Airlines](../../documentation/elements_of_retention.png){#fig-retention-factors}
 
 # Statistical Methods
 
 ## Sample and Data Collection
 
-Survey data was collected from U.S. airline pilots during April and May 2025. After exclusions for incomplete responses, non-air carrier pilots, and restriction to regional airline pilots only, n = 57 valid responses remained for analysis. This regional-only subset addresses the original study's scope-sample alignment, where 75% of respondents were regional pilots.
+Survey data was collected from U.S.-based regional airline pilots during April and May 2025. After exclusions for incomplete responses and non-regional airline pilots, n = 57 valid responses remained for analysis.
 
 ## Statistical Tests
 
@@ -67,7 +67,7 @@ All ranking data is ordinal; therefore, non-parametric tests are used throughout
 
 This quantitative study employs a **hierarchical false discovery rate (FDR) control procedure**:
 
-**General Factor Analysis (24 tests):** Benjamini-Hochberg FDR at q = 0.10 applied across all demographic comparisons (6 factors x 4 demographics; carrier type excluded in regional-only analysis).
+**General Factor Analysis (24 tests):** Benjamini-Hochberg FDR at q = 0.10 applied across all demographic comparisons (6 factors x 4 demographics).
 
 **Subfactor Analysis (155 tests):** Two-step hierarchical procedure:
 
@@ -85,7 +85,7 @@ This quantitative study employs a **hierarchical false discovery rate (FDR) cont
 
 Analysis conducted in Positron (Version: 2025.12.2 build 5) with R 4.5.2 using: tidyverse, rstatix, coin, DescTools, knitr, janitor.
 
-**Code Availability:** The complete analysis code is available at `scripts/analysis/unified_retention_analysis-mod57.qmd` in the [GitHub repository][repo-url]. The original full-sample analysis (n=76) is available at `scripts/analysis/unified_retention_analysis.qmd`.
+**Code Availability:** The complete analysis code is available at `scripts/analysis/unified_retention_analysis-mod57.qmd` in the [GitHub repository][repo-url].
 
 [repo-url]: https://github.com/mikehickey2/US-Airline-Pilot-Retention-Analysis
 
@@ -124,7 +124,7 @@ source(here("R/retention_helpers.R"))
 options(scipen = 999)
 knitr::opts_chunk$set(fig.width = 10, fig.height = 6)
 
-# Create output directories for regional-only analysis
+# Create output directories for analysis
 dir.create(
   here("output/tables/unified_analysis_regional"),
   showWarnings = FALSE,
@@ -190,22 +190,20 @@ included_data <- cleaned %>%
   select(-exclusion_reason)
 
 # ============================================================================
-# SCOPE RESTRICTION: Regional Airlines Only
+# SAMPLE: U.S.-based Regional Airlines
 # ============================================================================
-# Filter to regional airline pilots only for this sensitivity analysis
-# This addresses reviewer concerns about scope-sample alignment
+# Include only U.S.-based regional airline pilots
 
 included_data <- included_data %>%
   filter(str_detect(air_carrier_type, "Regional"))
 
-# Verify regional-only filter
+# Verify sample filter
 regional_n <- nrow(included_data)
 ```
 
 ::: {.callout-note}
-## Scope Restriction
-This analysis is restricted to **regional airline pilots only** (n = `r nrow(included_data)`).
-The original sample contained 76 pilots across carrier types (Regional: 57, Major: 11, LCC: 5, Other: 3).
+## Sample
+This analysis includes **U.S.-based regional airline pilots** (n = `r nrow(included_data)`).
 :::
 
 ```{r}
@@ -715,14 +713,14 @@ if (all(pos_counts >= 5)) {
 ### Carrier Type
 
 ::: {.callout-note}
-## Not Applicable for Regional-Only Analysis
-Carrier type comparison is **not applicable** in this regional-only analysis. All 57 pilots in this sample are employed at regional airlines. See the original analysis (n=76) for carrier type comparisons across Regional, Major, LCC, and Other categories.
+## Not Applicable
+Carrier type comparison is not applicable as all 57 pilots in this sample are employed at U.S.-based regional airlines.
 :::
 
 ```{r}
 #| label: rq2f-carrier
 #| output: false
-# NOTE: Carrier type comparison not applicable in regional-only analysis
+# NOTE: Carrier type comparison not applicable - all pilots are regional
 # All 57 pilots are regional airline employees
 # This code block is retained for structural compatibility but produces no output
 
@@ -836,7 +834,7 @@ This section examines the 31 subfactors within each retention construct and test
 # Helper functions are sourced from R/retention_helpers.R in setup chunk
 # See documentation/function_architecture.md for design details
 
-# Create subfactor output directories for regional-only analysis
+# Create subfactor output directories
 dir.create(
   here("output/tables/subfactor_analysis_regional"),
   showWarnings = FALSE,
@@ -1274,7 +1272,7 @@ This analysis has several important limitations:
 
 ## Sample Size and Power
 
-The regional-only sample of n = 57 provides adequate power only for detecting large effects. For demographic comparisons:
+The sample of n = 57 provides adequate power only for detecting large effects. For demographic comparisons:
 
 | Comparison | Group Sizes | Detectable Effect (80% power) |
 |------------|-------------|-------------------------------|
@@ -1284,8 +1282,6 @@ The regional-only sample of n = 57 provides adequate power only for detecting la
 | Military | 53 vs 4 | Very large only (r > 0.70) |
 | Position | 36 vs 21 | Medium-large (r > 0.40) |
 
-**Note**: The reduction from n=76 to n=57 further limits statistical power, particularly for already-small subgroups.
-
 **Gender and Military comparisons warrant particular caution**: With only 5 female and 4 military-background respondents in the regional subset, these analyses have very low power to detect even large effects.
 
 ## Additional Limitations
@@ -1294,7 +1290,6 @@ The regional-only sample of n = 57 provides adequate power only for detecting la
 2.  **Self-Selection Bias**: Survey respondents may not represent all U.S. regional airline pilots; those with strong opinions about retention may be overrepresented
 3.  **Cross-Sectional Design**: Retention priorities may change over career stage; this snapshot cannot capture temporal dynamics
 4.  **Ranking Methodology**: Forced rankings prevent assessment of absolute importance; factors ranked low may still be important in absolute terms
-5.  **Scope Restriction**: This analysis excludes 19 pilots from major airlines (11), LCCs (5), and other carriers (3). While improving internal validity for regional airline conclusions, this limits generalizability to the broader U.S. airline pilot population
 
 # References
 
