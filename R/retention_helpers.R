@@ -136,7 +136,7 @@ prepare_construct_data <- function(data, var_cols, demographics) {
     ) |>
     dplyr::filter(!is.na(rank))
 
-  return(result)
+  result
 }
 
 #' Compute descriptive statistics for construct items
@@ -188,11 +188,11 @@ run_friedman_test <- function(long_data) {
 #' @param item_labels Named vector for recoding item names
 #' @return Tibble with test results, effect sizes, and adjusted p-values
 run_demographic_comparison <- function(
-    long_data,
-    demo_var,
-    demo_type,
-    exact,
-    item_labels
+  long_data,
+  demo_var,
+  demo_type,
+  exact,
+  item_labels
 ) {
   checkmate::assert_data_frame(long_data, min.rows = 1)
   checkmate::assert_string(demo_var)
@@ -239,7 +239,7 @@ run_demographic_comparison <- function(
     }
   }
 
-  return(result)
+  result
 }
 
 #' Create median rank bar chart
@@ -251,9 +251,9 @@ run_demographic_comparison <- function(
 #' @param color Fill color for bars (default "steelblue")
 #' @return ggplot object
 create_median_rank_chart <- function(
-    desc_stats,
-    construct_name,
-    color = "steelblue"
+  desc_stats,
+  construct_name,
+  color = "steelblue"
 ) {
   checkmate::assert_data_frame(desc_stats, min.rows = 1)
   checkmate::assert_string(construct_name)
@@ -286,11 +286,11 @@ create_median_rank_chart <- function(
 #' @param demo_results Named list of demographic comparison tibbles
 #' @param output_dir Directory path for output files
 export_construct_tables <- function(
-    construct_name,
-    desc_stats,
-    friedman_result,
-    demo_results,
-    output_dir
+  construct_name,
+  desc_stats,
+  friedman_result,
+  demo_results,
+  output_dir
 ) {
   checkmate::assert_string(construct_name)
   checkmate::assert_data_frame(desc_stats)
@@ -334,13 +334,13 @@ export_construct_tables <- function(
 #' @return List containing all results: descriptive_stats, friedman_result,
 #'   demographic_results, screening_p, and figure
 analyze_construct <- function(
-    data,
-    construct_name,
-    var_cols,
-    item_labels,
-    demographics = default_demographics,
-    output_dir = "../../output/tables/subfactor_analysis",
-    plot_color = "steelblue"
+  data,
+  construct_name,
+  var_cols,
+  item_labels,
+  demographics = default_demographics,
+  output_dir = "../../output/tables/subfactor_analysis",
+  plot_color = "steelblue"
 ) {
   checkmate::assert_data_frame(data, min.rows = 1)
   checkmate::assert_string(construct_name)

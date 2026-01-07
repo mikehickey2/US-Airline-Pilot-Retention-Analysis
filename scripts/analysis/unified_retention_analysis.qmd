@@ -337,6 +337,9 @@ This section analyzes the rankings of six broad retention constructs:
 
 ```{r}
 #| label: rq1-descriptives
+#| fig-cap: "Distribution of top-ranked retention factors among U.S. airline pilots"
+#| fig-alt: "Bar chart showing the number of pilots ranking each of six retention factors as most important"
+
 # Build long-format data for general factors
 general_long <- included_data %>%
   select(respondent_id, all_of(rank_cols)) %>%
@@ -948,6 +951,9 @@ constructs_config <- list(
 
 ```{r}
 #| label: analyze-financial
+#| fig-cap: "Median ranks for Financial subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for six financial retention subfactors"
+
 results_financial <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$financial$name,
@@ -979,6 +985,9 @@ kable(results_financial$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-qol
+#| fig-cap: "Median ranks for Quality of Life subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for six quality of life retention subfactors"
+
 results_qol <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$qol$name,
@@ -1010,6 +1019,9 @@ kable(results_qol$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-professional
+#| fig-cap: "Median ranks for Professional Opportunity subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for five professional opportunity subfactors"
+
 results_professional <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$professional$name,
@@ -1041,6 +1053,9 @@ kable(results_professional$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-recognition
+#| fig-cap: "Median ranks for Recognition subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for four recognition retention subfactors"
+
 results_recognition <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$recognition$name,
@@ -1072,6 +1087,9 @@ kable(results_recognition$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-schedule
+#| fig-cap: "Median ranks for Schedule subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for five schedule retention subfactors"
+
 results_schedule <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$schedule$name,
@@ -1103,6 +1121,9 @@ kable(results_schedule$demographic_results$experience, digits = 3,
 
 ```{r}
 #| label: analyze-operational
+#| fig-cap: "Median ranks for Operational subfactors"
+#| fig-alt: "Bar chart showing median importance ranks for five operational retention subfactors"
+
 results_operational <- analyze_construct(
   data = included_data,
   construct_name = constructs_config$operational$name,

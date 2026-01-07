@@ -53,7 +53,7 @@ The analysis has two parts:
 
 ## Sample and Data Collection
 
-Survey data was collected from U.S. airline pilots in May 2025. After exclusions for incomplete responses, non-air carrier pilots, and restriction to regional airline pilots only, n = 57 valid responses remained for analysis. This regional-only subset addresses the original study's scope-sample alignment where 75% of respondents were regional pilots.
+Survey data was collected from U.S. airline pilots during April and May 2025. After exclusions for incomplete responses, non-air carrier pilots, and restriction to regional airline pilots only, n = 57 valid responses remained for analysis. This regional-only subset addresses the original study's scope-sample alignment, where 75% of respondents were regional pilots.
 
 ## Statistical Tests
 
@@ -83,7 +83,7 @@ This quantitative study employs a **hierarchical false discovery rate (FDR) cont
 
 ## Software
 
-Analysis conducted in R 4.5.1 using: tidyverse, rstatix, coin, DescTools, knitr, janitor.
+Analysis conducted in Positron (Version: 2025.12.2 build 5) with R 4.5.2 using: tidyverse, rstatix, coin, DescTools, knitr, janitor.
 
 **Code Availability:** The complete analysis code is available at `scripts/analysis/unified_retention_analysis-mod57.qmd` in the [GitHub repository][repo-url]. The original full-sample analysis (n=76) is available at `scripts/analysis/unified_retention_analysis.qmd`.
 
