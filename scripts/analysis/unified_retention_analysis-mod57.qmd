@@ -289,7 +289,7 @@ included_data <- included_data %>%
 included_data <- included_data %>%
   rename(
     financial_rank    = general_1,
-    lifestyle_rank    = general_2,
+    qol_rank          = general_2,
     professional_rank = general_3,
     recognition_rank  = general_4,
     schedule_rank     = general_5,
@@ -297,7 +297,7 @@ included_data <- included_data %>%
   )
 
 # Store rank column names for Part 1
-rank_cols <- c("financial_rank", "lifestyle_rank", "professional_rank",
+rank_cols <- c("financial_rank", "qol_rank", "professional_rank",
                "recognition_rank", "schedule_rank", "operational_rank")
 ```
 
@@ -345,7 +345,7 @@ kable(sample_summary)
 This section analyzes the rankings of six broad retention constructs:
 
 1.  Financial (salary, benefits, bonuses)
-2.  Quality of Life/Lifestyle (schedule, family, work-life balance)
+2.  Quality of Life (schedule, family, work-life balance)
 3.  Professional Opportunity (stability, upgrade, aircraft type)
 4.  Recognition (uniform, respect, awards)
 5.  Schedule (fixed vs variable, bidding systems)
