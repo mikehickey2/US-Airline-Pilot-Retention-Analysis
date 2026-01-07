@@ -1277,11 +1277,11 @@ The total sample of n = 76 provides adequate power only for detecting large effe
 
 | Comparison | Group Sizes | Detectable Effect (80% power) |
 |------------|-------------|-------------------------------|
-| Age groups | ~40 vs ~36 | Medium (r ≈ 0.35) |
+| Age groups | 58 vs 18 | Medium-large (r > 0.40) |
 | Experience | ~19 per quartile | Large (eta² > 0.10) |
 | Gender | 67 vs 8 | Very large only (r > 0.6) |
-| Military | ~35 vs ~40 | Medium (r ≈ 0.35) |
-| Position | ~45 vs ~30 | Medium (r ≈ 0.35) |
+| Military | 69 vs 7 | Very large only (r > 0.6) |
+| Position | 50 vs 26 | Medium (r ≈ 0.35) |
 
 **Gender comparisons warrant particular caution**: With only 8 female respondents, the analysis has approximately 20% power to detect medium effects - meaning 80% of true medium-sized gender differences would go undetected.
 

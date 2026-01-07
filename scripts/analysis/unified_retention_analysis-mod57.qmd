@@ -579,7 +579,7 @@ gender_medians <- general_gender_long %>%
 kable(gender_medians, digits = 1,
       caption = "Table 7: Median Rank of General Factors by Gender")
 
-# Mann-Whitney U tests (EXACT due to small female n=8)
+# Mann-Whitney U tests (EXACT due to small female n=5)
 gender_counts <- table(included_data$gender_clean)
 if (all(c("Male", "Female") %in% names(gender_counts)) &&
     all(gender_counts[c("Male", "Female")] >= 5)) {
